@@ -1,0 +1,12 @@
+name: GermHETools
+version: '${version}'
+main: net.mcbbs.a1mercet.germhetools.GermHETools
+softdepend:
+  - GermPlugin
+commands:
+  ghe:
+    description: command
+    permission: "ghe.cmd"
+    alias:
+      - g
+      - he
