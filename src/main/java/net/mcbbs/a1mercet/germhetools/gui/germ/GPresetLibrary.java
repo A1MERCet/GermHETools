@@ -3,7 +3,8 @@ package net.mcbbs.a1mercet.germhetools.gui.germ;
 import com.germ.germplugin.api.dynamic.gui.*;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
-import net.mcbbs.a1mercet.germhetools.player.ges.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class GPresetLibrary extends GermGuiBase
     public class GList extends GermGuiCanvas
     {
         public String color = "blue";
-        public final PresetLibrary.PresetList list;
+        public final PresetLibrary.PresetList<IPreset<?>> list;
         public boolean isOpen = false;
 
         public final GermGuiTexture background  = UtilGerm2K.createTexture("background","",0,20,590,5);
@@ -30,10 +31,10 @@ public class GPresetLibrary extends GermGuiBase
                 }, GermGuiButton.EventType.LEFT_CLICK);
         public final GermGuiButton delete       = UtilGerm2K.createButton("delete","aestus/he/library/delete.png",560,5).registerCallbackHandler((p,b)->delete(), GermGuiButton.EventType.LEFT_CLICK);
         public final GermGuiLabel name          = UtilGerm2K.createLabel("name","",550,8,2.5F, GermGuiLabel.Align.RIGHT);
-        public final GermGuiTexture searchTex   = UtilGerm2K.createTexture("search_tex","aestus/he/library/search.png",58,3);
+        public final GermGuiTexture searchTex   = UtilGerm2K.createTexture("search_tex","aestus/he/library/search.png",48,3);
         public final GermGuiInput search        = new GermGuiInput("search")
                 .setPermanentFocus(false).setPreview("...").setSync(true).setSwallow(true).setAutoClear(false)
-                .setBackground(false).setWidth("173/2560*w").setHeight("25/1440*h").setLocationX("80/2560*w").setLocationY("3/1440*h");
+                .setBackground(false).setWidth("173/2560*w").setHeight("25/1440*h").setLocationX("60/2560*w").setLocationY("3/1440*h");
 
         public final GermGuiScroll scroll       = new GermGuiScroll("scroll")
                 .setWidth("570/2560*w").setHeight("1000/1440*h")
@@ -46,7 +47,7 @@ public class GPresetLibrary extends GermGuiBase
                 .setLocationVX("-15/2560*w").setWidthV("10/2560*w");
         public final List<GPreset> presets = new ArrayList<>();
 
-        public GList(PresetLibrary.PresetList list , String color)
+        public GList(PresetLibrary.PresetList<IPreset<?>> list , String color)
         {
             super(list.category);
             this.list   = list;
@@ -76,14 +77,14 @@ public class GPresetLibrary extends GermGuiBase
 
             clear();
 
-            List<HEState> states = new ArrayList<>();
+            List<IPreset<?>> presets = new ArrayList<>();
 
-            for(HEState s : list)
-                if(s.id.contains(v) || s.name.contains(v) || s.model.contains(v) || s.texture.contains(v) || s.data.containsKey(v))
-                    states.add(s);
+            for(IPreset<?> s : list)
+                if(s.getID().contains(v) || s.getName().contains(v))
+                    presets.add(s);
 
             isOpen=true;
-            states.forEach(e->presets.add(createGPreset(e)));
+            presets.forEach(e-> this.presets.add(e.createGPreset(ps,e,PSIZE)));
             updateLayout();
         }
         public void reset()
@@ -91,8 +92,8 @@ public class GPresetLibrary extends GermGuiBase
             clear();
 
             isOpen=true;
-            for(HEState state : list)
-                presets.add(createGPreset(state));
+            for(IPreset<?> preset : list)
+                presets.add(preset.createGPreset(ps,preset,PSIZE));
             updateLayout();
         }
         public void clear()
@@ -102,10 +103,7 @@ public class GPresetLibrary extends GermGuiBase
             presets.clear();
             updateLayout();
         }
-        public GPreset createGPreset(HEState state)
-        {
-            return new GPreset(ps,state);
-        }
+
         public void updateLayout()
         {
             int rank = 0,row = 0;
@@ -133,10 +131,10 @@ public class GPresetLibrary extends GermGuiBase
             title.setDefaultPath("aestus/he/library/list_"+color+(isOpen?"_open":"")+".png");
             name.setText("#FFAFAFAF"+list.category+"("+list.size()+")");
         }
-        public void remove(HEState state)
+        public void remove(IPreset<?> preset)
         {
             for(GPreset g : presets)
-                if(g.state.equals(state))
+                if(g.preset.equals(preset))
                 {
                     scroll.removeGuiPart(g);
                     presets.remove(g);
@@ -145,19 +143,19 @@ public class GPresetLibrary extends GermGuiBase
                     break;
                 }
         }
-        public void update(HEState state)
+        public void update(IPreset<?> preset)
         {
             for(GPreset g : presets)
-                if(g.state.equals(state))
+                if(g.preset.equals(preset))
                 {
                     g.update();
                     break;
                 }
         }
-        public void add(HEState state)
+        public void add(IPreset<?> preset)
         {
-            remove(state);
-            GPreset g = createGPreset(state);
+            remove(preset);
+            GPreset g = preset.createGPreset(ps,preset,PSIZE);
             presets.add(g);
             updateLayout();
             name.setText("#FFAFAFAF"+list.category+"("+(list.size()+1)+")");
@@ -237,30 +235,30 @@ public class GPresetLibrary extends GermGuiBase
         lists.remove(list);
         updateLayout();
     }
-    public void update(String category , HEState state)
+    public void update(String category , IPreset<?> preset)
     {
         for(GList l : lists)
             if(l.list.category.equals(category))
             {
-                l.update(state);
+                l.update(preset);
                 break;
             }
     }
-    public void add(String category , HEState state)
+    public void add(String category , IPreset<?> preset)
     {
         for(GList l : lists)
             if(l.list.category.equals(category))
             {
-                l.add(state);
+                l.add(preset);
                 break;
             }
     }
-    public void remove(String category , HEState state)
+    public void remove(String category , IPreset<?> preset)
     {
         for(GList l : lists)
             if(l.list.category.equals(category))
             {
-                l.remove(state);
+                l.remove(preset);
                 break;
             }
     }

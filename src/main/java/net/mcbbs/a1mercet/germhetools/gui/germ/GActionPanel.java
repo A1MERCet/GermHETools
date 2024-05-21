@@ -13,10 +13,14 @@ import java.util.List;
 public class GActionPanel extends GermGuiBase
 {
 
+    public interface CallbackAction { boolean handle(Player p , GActionBar bar);}
+
     public static class GActionBar extends GermGuiCanvas
     {
         public final GActionPanel parent;
         public final Action action;
+        public GermGuiButton button;
+
         public GActionBar(GActionPanel parent , Action a)
         {
             super(a.id);
@@ -36,11 +40,15 @@ public class GActionPanel extends GermGuiBase
             if(e == GermGuiButton.EventType.BEGIN_HOVER)
                 parent.select(this);
         }
-        GermGuiButton button;
         protected void init()
         {
             button = UtilGerm2K.createButton("button","aestus/att/action/bar.png",5,0)
                     .registerCallbackHandler((p,b)->{
+
+                        for(CallbackAction c : parent.getCallbacks())
+                            if(!c.handle(p,this))
+                                return;
+
                         action.callback((GActionPanel)getGermGuiScreen());
                     }, GermGuiButton.EventType.LEFT_CLICK)
                     .registerCallbackHandler((p,b)->onAction(p,GermGuiButton.EventType.BEGIN_HOVER), GermGuiButton.EventType.BEGIN_HOVER)
@@ -90,8 +98,10 @@ public class GActionPanel extends GermGuiBase
 
     public final Player iplayer;
     public final PlayerState ps;
-    protected final List<Action> actions;
+    public final List<Action> actions;
+    public final List<CallbackAction> callbacks = new ArrayList<>();
     public int height = 0;
+
 
     public GActionPanel(Player iplayer)
     {
@@ -110,7 +120,11 @@ public class GActionPanel extends GermGuiBase
         registerKeyDownHandler(KeyType.KEY_EQUALS,(p,g)->confirm());
     }
 
+    public GActionPanel registerCallback(CallbackAction c)  {callbacks.add(c);return this;}
+    public List<CallbackAction> getCallbacks()              {return callbacks;}
+
     public GActionPanel addAction(Action a){actions.add(a);return this;}
+    public GActionPanel addAction(Action a,int index){actions.add(index,a);return this;}
 
     protected GActionBar current = null;
     public void confirm()
@@ -186,6 +200,12 @@ public class GActionPanel extends GermGuiBase
     public Player getIplayer() {return iplayer;}
     public PlayerState getPs() {return ps;}
     public List<Action> getActions() {return actions;}
+    public Action getAction(String id) {
+        for(Action a : actions)
+            if(a.id.equals(id))
+                return a;
+        return null;
+    }
 
     protected boolean callEvent()
     {

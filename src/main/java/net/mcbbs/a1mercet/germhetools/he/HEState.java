@@ -1,7 +1,12 @@
 package net.mcbbs.a1mercet.germhetools.he;
 
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
-import net.mcbbs.a1mercet.germhetools.util.IConfig;
+import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
+import net.mcbbs.a1mercet.germhetools.gui.germ.GActionPanel;
+import net.mcbbs.a1mercet.germhetools.gui.germ.GPreset;
+import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetHEBlock;
+import net.mcbbs.a1mercet.germhetools.player.PlayerState;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
 import net.mcbbs.a1mercet.germhetools.util.Options;
 import net.mcbbs.a1mercet.germhetools.util.UtilConfig;
 import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
@@ -18,7 +23,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HEState implements IConfig
+public class HEState implements IPreset<HEState>
 {
 
     @Override public String getDefaultPath() {return id;}
@@ -26,6 +31,8 @@ public class HEState implements IConfig
     @Override
     public void save(ConfigurationSection section)
     {
+        IPreset.super.save(section);
+
         section.set("ID",               id);
         section.set("Name",             name);
         section.set("Model",            model);
@@ -100,22 +107,7 @@ public class HEState implements IConfig
     }
     public HEState(HEState s)
     {
-        this.id=s.id;
-        this.name=s.name;
-        setLocation(s.location);
-        setTransform(s.transform.getX(),s.transform.getY(),s.transform.getZ());
-        setScale(s.scale.getX(),s.scale.getY(),s.scale.getZ());
-        setRotate(s.rotate.getX(),s.rotate.getY(),s.rotate.getZ());
-        setAABB(s.aabbMin.getX(),s.aabbMin.getY(),s.aabbMin.getZ(),s.aabbMax.getX(),s.aabbMax.getY(),s.aabbMax.getZ());
-        this.followStyle=s.followStyle;
-        this.size=s.size;
-        this.enableGlowTexture=s.enableGlowTexture;
-        this.passable=s.passable;
-        this.glowTexture=s.glowTexture;
-        this.model=s.model;
-        this.texture=s.texture;
-        this.material.addAll(s.material);
-        this.data=new Options<>(s.data);
+        copy(s);
     }
 
     public ItemStack createItemStack()
@@ -306,4 +298,59 @@ public class HEState implements IConfig
     public HEState setAABBMax(double maxx, double maxy,double maxz){aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
     public HEState setId(String id) {this.id = id;return this;}
     public HEState setName(String name) {this.name = name;return this;}
+
+    @Override public GPreset createGPreset(PlayerState ps , IPreset<?> preset , int size) {GPreset g = new GPresetHEBlock(ps, (HEState) preset.getObject(),size);g.build();return g;}
+    @Override public String getType() {return "BLOCK";}
+    @Override public String getID() {return id;}
+    @Override public String getName() {return name;}
+    @Override public long getAddDate() {return data.getLong("date");}
+    @Override public HEState getObject() {return this;}
+    @Override public Options<String> getData() {return data;}
+    @Override public void copy(IPreset<HEState> preset) {
+        HEState s = preset.getObject();
+
+        this.id=s.id;
+        this.name=s.name;
+        setLocation(s.location);
+        setTransform(s.transform.getX(),s.transform.getY(),s.transform.getZ());
+        setScale(s.scale.getX(),s.scale.getY(),s.scale.getZ());
+        setRotate(s.rotate.getX(),s.rotate.getY(),s.rotate.getZ());
+        setAABB(s.aabbMin.getX(),s.aabbMin.getY(),s.aabbMin.getZ(),s.aabbMax.getX(),s.aabbMax.getY(),s.aabbMax.getZ());
+        this.followStyle=s.followStyle;
+        this.size=s.size;
+        this.enableGlowTexture=s.enableGlowTexture;
+        this.passable=s.passable;
+        this.glowTexture=s.glowTexture;
+        this.model=s.model;
+        this.texture=s.texture;
+        this.material.addAll(s.material);
+        this.data=new Options<>(s.data);
+    }
+
+    @Override
+    public GActionPanel createGActionPanel(GPreset gPreset) {
+        PlayerState ps = gPreset.ps;
+        GActionPanel g =  IPreset.super.createGActionPanel(gPreset);
+
+        g.addAction(new GActionPanel.Action("create","创建物品"){
+            @Override public boolean callback(GActionPanel parent) {
+                if(!super.callback(parent))return false;
+
+                parent.ps.player.getInventory().addItem(createItemStack());
+                parent.close();
+
+                return true;
+            }},3);
+        g.addAction(new GActionPanel.Action("edit","编辑"){
+            @Override public boolean callback(GActionPanel parent) {
+                if(!super.callback(parent))return false;
+
+                HEGuiManager.createHEStateGui(ps.player, HEState.this,false).openGuiTo(ps.player);
+                parent.close();
+
+                return true;
+            }},3);
+
+        return g;
+    }
 }

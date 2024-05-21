@@ -105,6 +105,7 @@ public class PlayerState implements IConfig
         String path = Config.path+"\\player\\"+name+".yml";
         File file = new File(path);
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
         save(cfg.createSection(getDefaultPath()));
 
         try {cfg.save(file);}catch (Exception e){e.printStackTrace();}
@@ -117,7 +118,6 @@ public class PlayerState implements IConfig
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         load(cfg.getConfigurationSection(getDefaultPath()) == null?cfg.createSection(getDefaultPath()):cfg.getConfigurationSection(getDefaultPath()));
-
     }
 
     @Override

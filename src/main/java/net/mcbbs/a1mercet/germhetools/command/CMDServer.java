@@ -1,5 +1,7 @@
 package net.mcbbs.a1mercet.germhetools.command;
 
+import io.netty.buffer.Unpooled;
+import net.mcbbs.a1mercet.germhetools.GermHETools;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
@@ -7,13 +9,14 @@ import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
-import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+
 
 public class CMDServer extends CMDBase
 {
@@ -31,14 +34,18 @@ public class CMDServer extends CMDBase
     public void test(CommandSender sender)
     {
         Player p = (Player)sender;
-        ItemStack isk = p.getInventory().getItemInMainHand();
-        NBTTagCompound nbt = UtilNBT.getItemNBT(isk);
-        UtilNBT.printNBT(nbt);
-        nbt.getCompound("tag").getCompound("CustomBlock").getCompound("scale").setDouble("width",0.1D);
-        nbt.getCompound("tag").getCompound("CustomBlock").getCompound("scale").setDouble("length",0.1D);
-        nbt.getCompound("tag").getCompound("CustomBlock").getCompound("scale").setDouble("height",0.1D);
-        p.getInventory().setItemInMainHand(UtilNBT.saveItemNBT(isk,nbt));
-        UtilNBT.printNBT(UtilNBT.getItemNBT(p.getInventory().getItemInMainHand()));
+
+        CraftPlayer craftPlayer = (CraftPlayer) p;
+        Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->{
+            PacketPlayInBlockPlace packet = new PacketPlayInBlockPlace(EnumHand.MAIN_HAND);
+            craftPlayer.getHandle().playerConnection.sendPacket(packet);
+        },1);
+        Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->{
+            CraftWorld craftWorld = (CraftWorld)p.getWorld();
+            BlockPosition blockPosition = new BlockPosition(0,0,0);
+            PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(craftWorld.getHandle(),blockPosition);
+            craftPlayer.getHandle().playerConnection.sendPacket(packet);
+        },1);
     }
 
     @CommandArgs(

@@ -1,6 +1,6 @@
 package net.mcbbs.a1mercet.germhetools.api.event;
 
-import net.mcbbs.a1mercet.germhetools.player.ges.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
 import org.bukkit.entity.Player;
 
 public class PresetLibraryEvent extends PlayerEventBase

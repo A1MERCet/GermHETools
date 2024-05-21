@@ -9,7 +9,8 @@ import net.mcbbs.a1mercet.germhetools.api.event.DeletePresetEvent;
 import net.mcbbs.a1mercet.germhetools.api.event.HEStateSaveEvent;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
-import net.mcbbs.a1mercet.germhetools.player.ges.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -19,7 +20,8 @@ public class EventGerm implements Listener
     public void confirmState(HEStateSaveEvent evt)
     {
         PlayerState ps = evt.ps;
-        PresetLibrary.PresetList list = ps.ges.library.getFrom(evt.state.id);
+        if(ps.ges==null)return;
+        PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getFrom(evt.state.id);
 
         if(list!=null)
             for(GermGuiScreen g : GuiManager.getOpenedAllGui(ps.player))
@@ -46,7 +48,7 @@ public class EventGerm implements Listener
         for(GermGuiScreen g : GuiManager.getOpenedAllGui(ps.player))
             if(g instanceof GPresetLibrary)
             {
-                ((GPresetLibrary) g).remove(evt.list.category,evt.state);
+                ((GPresetLibrary) g).remove(evt.list.category,evt.preset);
             }
     }
 

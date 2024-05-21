@@ -12,11 +12,14 @@ import net.mcbbs.a1mercet.germhetools.he.HEManager;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
-import net.mcbbs.a1mercet.germhetools.player.ges.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -114,7 +117,7 @@ public class GHEState extends GermGuiBase
                 .setScrollableV("0/1440*w")
                 .setSliderV(new GermGuiColor("sliderV").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"))
                 .setSliderH(new GermGuiColor("sliderH").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"));
-        public final GermGuiLabel amount = UtilGerm2K.createLabel("amount","0",215,10,2F);
+        public final GermGuiLabel amount = UtilGerm2K.createLabel("amount","0",215,15,4F);
         public GMaterials()
         {
             super("materials");
@@ -669,15 +672,15 @@ public class GHEState extends GermGuiBase
             iplayer.getInventory().setItemInMainHand(state.createItemStack());
             iplayer.getInventory().getItemInMainHand().setAmount(a);
         }else if(state.location.getWorld()!=null) {
-            Location playerLocation = iplayer.getLocation();
-
             Chunk chunk = state.location.getChunk();
             boolean r = state.place();
-            iplayer.teleport(new Location(iplayer.getWorld(),1000D,1000D,1000D));
 
-            chunk.unload();
-            chunk.load();
-            Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->iplayer.teleport(playerLocation),4);
+            PacketPlayOutUnloadChunk packet1 = new PacketPlayOutUnloadChunk(chunk.getX(),chunk.getZ());
+            ((CraftPlayer)iplayer).getHandle().playerConnection.sendPacket(packet1);
+
+            PacketPlayOutMapChunk packet2 = new PacketPlayOutMapChunk(((CraftChunk)chunk).getHandle(),65535);
+            ((CraftPlayer)iplayer).getHandle().playerConnection.sendPacket(packet2);
+
             iplayer.sendMessage(r?"已保存":"保存失败");
         }
 
@@ -733,7 +736,7 @@ public class GHEState extends GermGuiBase
             this.state=state;
             init();
 
-            PresetLibrary.PresetList list = ps.ges.library.getList("默认目录");
+            PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getList("默认目录");
             if(list!=null)inputCategory.setInput(list.category);
         }
         protected void init()
@@ -761,7 +764,7 @@ public class GHEState extends GermGuiBase
 
             int i = 0;
             boolean v = false;
-            for(PresetLibrary.PresetList list : ps.ges.library.getList())
+            for(PresetLibrary.PresetList<IPreset<?>> list : ps.ges.library.getList())
             {
                 if(list.category.equals(category))v=true;
 
@@ -786,7 +789,7 @@ public class GHEState extends GermGuiBase
         {
             if(id==null||name==null||category==null||"".equals(id)||"".equals(name)||"".equals(category))return;
 
-            PresetLibrary.PresetList list = ps.ges.library.getList(category);
+            PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getList(category);
             if(list==null) list = ps.ges.library.createList(category);
             if(list==null) return;
 

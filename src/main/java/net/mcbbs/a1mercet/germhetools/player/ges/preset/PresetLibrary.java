@@ -1,4 +1,4 @@
-package net.mcbbs.a1mercet.germhetools.player.ges;
+package net.mcbbs.a1mercet.germhetools.player.ges.preset;
 
 import net.mcbbs.a1mercet.germhetools.api.event.AddPresetEvent;
 import net.mcbbs.a1mercet.germhetools.api.event.DeletePresetEvent;
@@ -27,7 +27,7 @@ public class PresetLibrary implements IConfig
 
         for(int i = 0;i<list.size();i++)
         {
-            PresetList presetList = list.get(i);
+            PresetList<IPreset<?>> presetList = list.get(i);
             presetList.save(section.createSection("Fold."+i));
         }
     }
@@ -40,7 +40,7 @@ public class PresetLibrary implements IConfig
 
         for(int i = 0;;i++)
             if(section.getConfigurationSection("Fold."+i)!=null){
-                PresetList list = new PresetList("NaN");
+                PresetList<IPreset<?>> list = new PresetList<>("NaN");
                 list.load(section.getConfigurationSection("Fold."+i));
                 this.list.add(list);
             }else {break;}
@@ -49,7 +49,7 @@ public class PresetLibrary implements IConfig
         if(getList("默认目录")==null)    createList("默认目录");
     }
 
-    public class PresetList extends ArrayList<HEState> implements IConfig
+    public class PresetList<E extends IPreset<?>> extends ArrayList<E> implements IConfig
     {
         protected boolean bypass = false;
         @Override public String getDefaultPath() {return category;}
@@ -79,7 +79,9 @@ public class PresetLibrary implements IConfig
             try {
                 for(int i = 0;;i++)
                     if(section.getConfigurationSection("Preset."+i)!=null) {
-                        HEState s = new HEState();
+                        String type = section.getString("Preset."+i+".Type");
+                        E s = (E) PresetType.create(type);
+                        if(s==null){Bukkit.getLogger().warning("预设类型 ["+type+"] 创建失实例败");continue;}
                         s.load(section.getConfigurationSection("Preset."+i));
                         add(s);
                     } else {break;}
@@ -97,10 +99,11 @@ public class PresetLibrary implements IConfig
 
 
         @Override
-        public boolean add(HEState state)
+        public boolean add(E preset)
         {
             lock.lock();
-            HEState copy = new HEState(state);
+            E copy = (E) preset.createInstance();
+            copy.copy((IPreset)preset);
 
             try {
                 if(bypass) return super.add(copy);
@@ -108,14 +111,13 @@ public class PresetLibrary implements IConfig
                 AddPresetEvent evt = new AddPresetEvent(PresetLibrary.this.owner.player,this,copy);
                 Bukkit.getServer().getPluginManager().callEvent(evt);
                 if(evt.isCancelled())return false;
-                copy.setLocation(null,0D,0D,0D);
 
                 return super.add(copy);
             }finally {lock.unlock();}
         }
 
         @Override
-        public HEState remove(int index) {
+        public E remove(int index) {
             lock.lock();
             try {
                 if(bypass) return super.remove(index);
@@ -142,17 +144,17 @@ public class PresetLibrary implements IConfig
             }finally {lock.unlock();}
         }
 
-        public void sortID()    {lock.lock();try {this.sort(Comparator.comparing(o -> o.id));}finally {lock.unlock();}}
-        public void sortName()  {lock.lock();try {this.sort(Comparator.comparing(o -> o.name));;}finally {lock.unlock();}}
-        public void sortData()  {lock.lock();try {this.sort(Comparator.comparingLong(o -> o.data.getLong("date")));}finally {lock.unlock();}}
+        public void sortID()    {lock.lock();try {this.sort(Comparator.comparing(o -> o.getID()));}finally {lock.unlock();}}
+        public void sortName()  {lock.lock();try {this.sort(Comparator.comparing(o -> o.getName()));}finally {lock.unlock();}}
+        public void sortData()  {lock.lock();try {this.sort(Comparator.comparingLong(o -> o.getAddDate()));}finally {lock.unlock();}}
 
-        public HEState get(String id)
+        public E get(String id)
         {
             lock.lock();
             try {
-                for(HEState s : this)
-                    if(id.equals(s.id))
-                        return s;
+                for(E e : this)
+                    if(id.equals(e.getID()))
+                        return e;
                 return null;
             }finally {lock.unlock();}
         }
@@ -161,8 +163,8 @@ public class PresetLibrary implements IConfig
         {
             lock.lock();
             try {
-                HEState is = get(i);
-                HEState js = get(j);
+                E is = get(i);
+                E js = get(j);
 
                 remove(j);
                 add(j,is);
@@ -172,7 +174,7 @@ public class PresetLibrary implements IConfig
         }
     }
 
-    protected final List<PresetList> list = new ArrayList<>();
+    protected final List<PresetList<IPreset<?>>> list = new ArrayList<>();
     public final List<String> favorites = new ArrayList<>();
 
     public PresetLibrary(PlayerState owner)
@@ -183,51 +185,51 @@ public class PresetLibrary implements IConfig
 
     public void setFavorite(String id)
     {
-        HEState state = get(id);
-        if(state!=null && !favorites.contains(id))
+        IPreset<?> preset = get(id);
+        if(preset!=null && !favorites.contains(id))
             favorites.add(id);
     }
-    public List<HEState> getFavorites()
+    public List<IPreset<?>> getFavorites()
     {
-        List<HEState> list = new ArrayList<>();
+        List<IPreset<?>> list = new ArrayList<>();
 
         for(String id : favorites)
         {
-            HEState state = get(id);
-            if(state!=null)list.add(state);
+            IPreset<?> preset = get(id);
+            if(preset!=null)list.add(preset);
         }
 
         return list;
     }
 
-    public PresetList getFrom(String id)
+    public PresetList<IPreset<?>> getFrom(String id)
     {
-        for (PresetList presetList : list)
+        for (PresetList<IPreset<?>> presetList : list)
         {
-            HEState state = presetList.get(id);
-            if(state!=null)return presetList;
+            IPreset<?> preset = presetList.get(id);
+            if(preset!=null)return presetList;
         }
         return null;
     }
 
-    public HEState get(String id)
+    public IPreset<?> get(String id)
     {
-        for (PresetList presetList : list)
+        for (PresetList<IPreset<?>> presetList : list)
         {
-            HEState state = presetList.get(id);
-            if(state!=null)return state;
+            IPreset<?> preset = presetList.get(id);
+            if(preset!=null)return preset;
         }
         return null;
     }
 
-    public PresetList getList(String category)
+    public PresetList<IPreset<?>> getList(String category)
     {
-        for (PresetList heStates : list)
+        for (PresetList<IPreset<?>> heStates : list)
             if (category.equals(heStates.category))
                 return heStates;
         return null;
     }
-    public PresetList deleteList(String category)
+    public PresetList<IPreset<?>> deleteList(String category)
     {
         if("favorites".equals(category))return null;
 
@@ -236,14 +238,14 @@ public class PresetLibrary implements IConfig
                 return list.remove(i);
         return null;
     }
-    public PresetList createList(String category)
+    public PresetList<IPreset<?>> createList(String category)
     {
-        for(PresetList l : list)
+        for(PresetList<IPreset<?>> l : list)
             if(category.equals(l.category))
                 return null;
-        PresetList presetList = new PresetList(category);
+        PresetList<IPreset<?>> presetList = new PresetList<>(category);
         list.add(presetList);
         return presetList;
     }
-    public List<PresetList> getList() {return list;}
+    public List<PresetList<IPreset<?>>> getList() {return list;}
 }
