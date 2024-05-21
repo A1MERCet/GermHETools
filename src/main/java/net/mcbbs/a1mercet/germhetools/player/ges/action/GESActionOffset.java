@@ -6,11 +6,11 @@ import net.mcbbs.a1mercet.germhetools.player.ges.builder.SampleBuilderVector;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
-public class GESActionMove extends GESActionVector
+public class GESActionOffset extends GESActionVector
 {
-    public GESActionMove(GES ges)
+    public GESActionOffset(GES ges)
     {
-        super(ges, "ges_move", "GES-移动", "MOVE");
+        super(ges, "ges_offset", "GES-偏移", "OFFSET");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class GESActionMove extends GESActionVector
         Vector cal = calVector();
 
         state.location.getBlock().setType(Material.AIR);
-        state.setLocation(state.location.getWorld(),cal.getX(),cal.getY(),cal.getZ());
+        state.setTransform(cal.getX(),cal.getY(),cal.getZ());
         state.place();
         ges.setHEState(state.location.getBlock());
         return true;
@@ -34,12 +34,12 @@ public class GESActionMove extends GESActionVector
         HEState state = getHEState();
         Vector cal = calVector();
 
-        state.setLocation(state.location.getWorld(),cal.getX(),cal.getY(),cal.getZ());
+        state.setTransform(cal.getX(),cal.getY(),cal.getZ());
         state.place();
         ges.setHEState(state.location.getBlock());
         return true;
     }
 
-    @Override public IGESAction createInstance(GES ges) {return new GESActionMove(ges);}
-    @Override public SampleBuilderVector<? extends IGESAction> createBuilder() {return new SampleBuilderVector<GESActionMove>(this);}
+    @Override public IGESAction createInstance(GES ges) {return new GESActionOffset(ges);}
+    @Override public SampleBuilderVector<? extends IGESAction> createBuilder() {return new SampleBuilderVector<GESActionOffset>(this);}
 }

@@ -2,8 +2,6 @@ package net.mcbbs.a1mercet.germhetools;
 
 import com.germ.germplugin.api.GermKeyAPI;
 import com.germ.germplugin.api.KeyType;
-import com.tuershen.nbtlibrary.CompoundLibraryManager;
-import com.tuershen.nbtlibrary.api.CompoundLibraryApi;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.command.CMDServer;
 import net.mcbbs.a1mercet.germhetools.event.Event;
@@ -18,7 +16,6 @@ import javax.swing.*;
 public final class GermHETools extends JavaPlugin {
 
     static GermHETools instance;
-    public static CompoundLibraryApi libraryApi;
 
     @Override
     public void onEnable()
@@ -30,7 +27,6 @@ public final class GermHETools extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new EventGerm(),this);
 
         BlockManager.init();
-        libraryApi = CompoundLibraryManager.getPluginManager(this);
         Bukkit.getLogger().info("§6[HETools]已成功加载");
 
         JFrame frame = new JFrame("TEST");

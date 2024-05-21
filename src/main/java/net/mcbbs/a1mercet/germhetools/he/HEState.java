@@ -1,37 +1,98 @@
 package net.mcbbs.a1mercet.germhetools.he;
 
-import com.tuershen.nbtlibrary.api.NBTTagCompoundApi;
-import com.tuershen.nbtlibrary.api.TileEntityCompoundApi;
-import com.tuershen.nbtlibrary.minecraft.nbt.*;
-import net.mcbbs.a1mercet.germhetools.GermHETools;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
+import net.mcbbs.a1mercet.germhetools.util.IConfig;
+import net.mcbbs.a1mercet.germhetools.util.Options;
+import net.mcbbs.a1mercet.germhetools.util.UtilConfig;
+import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HEState
+public class HEState implements IConfig
 {
+
+    @Override public String getDefaultPath() {return id;}
+
+    @Override
+    public void save(ConfigurationSection section)
+    {
+        section.set("ID",               id);
+        section.set("Name",             name);
+        section.set("Model",            model);
+        section.set("Texture",          texture);
+
+        section.set("Size",             size);
+        section.set("FollowStyle",      followStyle);
+        section.set("Passable",         passable);
+        section.set("EnableGlowTexture",enableGlowTexture);
+        section.set("GlowTexture",      glowTexture);
+
+        section.set("Transform",    transform.toString());
+        section.set("Scale",        scale.toString());
+        section.set("Rotate",       rotate.toString());
+        section.set("AABBMax",      aabbMax.toString());
+        section.set("AABBMin",      aabbMin.toString());
+
+        data.save(section.createSection("data"));
+
+        section.set("Material",     material);
+    }
+
+    @Override
+    public void load(ConfigurationSection section)
+    {
+        id                  = section.getString("ID");
+        name                = section.getString("Name");
+        model               = section.getString("Model");
+        texture             = section.getString("Texture");
+
+        followStyle         = section.getString("FollowStyle");
+        size                = section.getDouble("Size");
+        passable            = section.getBoolean("Passable");
+        enableGlowTexture   = section.getBoolean("EnableGlowTexture");
+        glowTexture         = section.getString("GlowTexture");
+
+        UtilConfig.toVector(transform,section.getString("Transform"));
+        UtilConfig.toVector(scale,section.getString("Scale"));
+        UtilConfig.toVector(rotate,section.getString("Rotate"));
+        UtilConfig.toVector(aabbMax,section.getString("AABBMax"));
+        UtilConfig.toVector(aabbMin,section.getString("AABBMin"));
+
+        if(section.getConfigurationSection("data")!=null)
+            data.load(section.getConfigurationSection("data"));
+
+        material.clear();
+        material.addAll(section.getStringList("Material"));
+    }
+
+    public String id = "NaN";
+    public String name = "NaN";
+    public String model = "";
+    public String texture = "";
+
     public final Location location = new Location(null,0,0,0);
     public final Vector transform = new Vector();
     public final Vector scale = new Vector();
     public final Vector rotate = new Vector();
     public final Vector aabbMax = new Vector();
     public final Vector aabbMin = new Vector();
-    public String followStyle = "static";
     public double size;
-    public boolean enableGlowTexture = false;
+    public String followStyle = "static";
     public boolean passable = false;
-
+    public boolean enableGlowTexture = false;
     public String glowTexture = "";
-    public String model = "";
-    public String texture = "";
+    public Options<String> data = new Options<>();
+
     public final List<String> material = new ArrayList<>();
 
     public HEState()
@@ -58,11 +119,11 @@ public class HEState
     {
         ItemStack i = new ItemStack(BlockManager.material);
 
-        NBTTagCompoundApi tagApi = GermHETools.libraryApi.getCompound(i);
-        TagCompound<TagBase> tagBase = tagApi.getNBTTagCompoundApi();
-        tagBase.put("CustomBlock",createTag());
-        tagApi.setCompoundMap(tagBase);
-        return GermHETools.libraryApi.setCompound(i,tagApi);
+        NBTTagCompound tag = UtilNBT.getItemNBT(i);
+        NBTTagCompound cutomsBlock = new NBTTagCompound();
+        cutomsBlock.set("CustomBlock",createTag());
+        tag.set("tag",cutomsBlock);
+        return UtilNBT.saveItemNBT(i,tag);
     }
     public boolean place(){return place(null);}
     public boolean place(Location loc)
@@ -72,94 +133,82 @@ public class HEState
         Block b = location.getBlock();
         if(!(BlockManager.material.name().equals(b.getType().name()))){
             b.setType(Material.valueOf(BlockManager.material.name()));
-            Bukkit.getLogger().warning("placed");
         }
 
-        TileEntityCompoundApi api = GermHETools.libraryApi.getTileEntityCompoundApi(b);
-        NBTTagCompoundApi tagApi = api.getNBTTagCompound();
-        TagCompound<TagBase> tagBase = tagApi.getNBTTagCompoundApi();
-        tagBase.put("CustomBlock",createTag());
+        NBTTagCompound tag = UtilNBT.getBlockNBT(b);
+        tag.set("CustomBlock",createTag());
 
-        api.saveNBTTag(tagApi);
-
+        UtilNBT.saveBlockNBT(b,tag);
         return true;
     }
     public boolean updateToBlock()
     {
         Block b = location.getBlock();
-        TileEntityCompoundApi api = GermHETools.libraryApi.getTileEntityCompoundApi(b);
-        NBTTagCompoundApi tagApi = api.getNBTTagCompound();
-        TagCompound<TagBase> tagBase = tagApi.getNBTTagCompoundApi();
-        tagBase.put("CustomBlock",createTag());
+        NBTTagCompound tag = UtilNBT.getBlockNBT(b);
+        tag.set("CustomBlock",createTag());
 
-        api.saveNBTTag(tagApi);
+        UtilNBT.saveBlockNBT(b,tag);
+
         return true;
     }
 
-    public TagCompound<? extends TagBase> createTag()
+    public NBTTagCompound createTag()
     {
-        TagCompound<TagBase> layer_CustomBlock = new TagCompound<>();
-        layer_CustomBlock.put("enableGlowTexture",new TagByte((byte) (glowTexture!=null&&!glowTexture.equals("")?1:0)));
-        layer_CustomBlock.put("passable",new TagByte((byte) (passable?1:0)));
-        layer_CustomBlock.put("size",new TagDouble(size));
-        layer_CustomBlock.put("followStyle",new TagString(followStyle));
-        layer_CustomBlock.put("glowTexture",new TagString(glowTexture));
-        layer_CustomBlock.put("model",new TagString(model));
-        layer_CustomBlock.put("texture",new TagString(texture));
+        NBTTagCompound layer_CustomBlock = new NBTTagCompound();
+        layer_CustomBlock.setByte("enableGlowTexture",(byte) (glowTexture!=null&&!glowTexture.equals("")?1:0));
+        layer_CustomBlock.setByte("passable",(byte) (passable?1:0));
+        layer_CustomBlock.setDouble("size",size);
+        layer_CustomBlock.setString("followStyle",followStyle);
+        layer_CustomBlock.setString("glowTexture",glowTexture);
+        layer_CustomBlock.setString("model",model);
+        layer_CustomBlock.setString("texture",texture);
 
-        TagCompound<TagBase> layer_aabb = new TagCompound<>();
-        layer_aabb.put("maxx",new TagDouble((float) aabbMax.getX()));
-        layer_aabb.put("maxy",new TagDouble((float) aabbMax.getY()));
-        layer_aabb.put("maxz",new TagDouble((float) aabbMax.getZ()));
-        layer_aabb.put("minx",new TagDouble((float) aabbMin.getX()));
-        layer_aabb.put("miny",new TagDouble((float) aabbMin.getY()));
-        layer_aabb.put("minz",new TagDouble((float) aabbMin.getZ()));
-        layer_CustomBlock.put("aabb",layer_aabb);
+        NBTTagCompound layer_aabb = new NBTTagCompound();
+        layer_aabb.setDouble("maxx",(float) aabbMax.getX());
+        layer_aabb.setDouble("maxy",(float) aabbMax.getY());
+        layer_aabb.setDouble("maxz",(float) aabbMax.getZ());
+        layer_aabb.setDouble("minx",(float) aabbMin.getX());
+        layer_aabb.setDouble("miny",(float) aabbMin.getY());
+        layer_aabb.setDouble("minz",(float) aabbMin.getZ());
+        layer_CustomBlock.set("aabb",layer_aabb);
 
-        TagCompound<TagBase> layer_rotate = new TagCompound<>();
-        layer_rotate.put("pitch",new TagDouble((float) rotate.getX()));
-        layer_rotate.put("roll",new TagDouble((float) rotate.getY()));
-        layer_rotate.put("yaw",new TagDouble((float) rotate.getZ()));
-        layer_CustomBlock.put("rotate",layer_rotate);
+        NBTTagCompound layer_rotate = new NBTTagCompound();
+        layer_rotate.setFloat("pitch",(float) rotate.getX());
+        layer_rotate.setFloat("roll",(float) rotate.getY());
+        layer_rotate.setFloat("yaw",(float) rotate.getZ());
+        layer_CustomBlock.set("rotate",layer_rotate);
 
-        TagCompound<TagBase> layer_scale = new TagCompound<>();
-        layer_scale.put("length",new TagDouble((float) scale.getX()));
-        layer_scale.put("height",new TagDouble((float) scale.getY()));
-        layer_scale.put("width",new TagDouble((float) scale.getZ()));
-        layer_CustomBlock.put("scale",layer_scale);
+        NBTTagCompound layer_scale = new NBTTagCompound();
+        layer_scale.setDouble("length",(float) scale.getX());
+        layer_scale.setDouble("height",(float) scale.getY());
+        layer_scale.setDouble("width",(float) scale.getZ());
+        layer_CustomBlock.set("scale",layer_scale);
 
-        TagCompound<TagBase> layer_transform = new TagCompound<>();
-        layer_transform.put("x",new TagDouble((float) transform.getX()));
-        layer_transform.put("y",new TagDouble((float) transform.getY()));
-        layer_transform.put("z",new TagDouble((float) transform.getZ()));
-        layer_CustomBlock.put("translate",layer_transform);
+        NBTTagCompound layer_transform = new NBTTagCompound();
+        layer_transform.setDouble("x",(float) transform.getX());
+        layer_transform.setDouble("y",(float) transform.getY());
+        layer_transform.setDouble("z",(float) transform.getZ());
+        layer_CustomBlock.set("translate",layer_transform);
 
-        TagCompound<TagBase> layer_material = new TagCompound<>();
+        NBTTagCompound layer_material = new NBTTagCompound();
         for(String m : material)
         {
             String name = m.split(":")[0];
             String path = m.replace(name+":","");
-            layer_material.put(name,new TagString(path));
+            layer_material.setString(name,path);
         }
-        layer_CustomBlock.put("materials",layer_material);
+        layer_CustomBlock.set("materials",layer_material);
 
         return layer_CustomBlock;
     }
 
     public HEState parse(ItemStack isk)
     {
-        NBTTagCompoundApi tagApi = GermHETools.libraryApi.getCompound(isk);
-        TagCompound<TagBase> tagBase = tagApi.getNBTTagCompoundApi();
+        NBTTagCompound tag = UtilNBT.getItemNBT(isk);
 
-//        if(tagBase.hasKey("tag")){
-//            if(tagBase.getCompound("tag").hasKey("CustomBlock")){
-//                return parse(tagBase.getCompound("tag").getCompound("CustomBlock"));
-//            }else {Bukkit.getLogger().warning("sss2");}
-//        }else {Bukkit.getLogger().warning("sss");}
-
-        if(tagBase.hasKey("CustomBlock")){
-            return parse(tagBase.getCompound("CustomBlock"));
-        }else {Bukkit.getLogger().warning("tag \"CustomBlock\" not find");}
+        if(tag.hasKey("tag")){
+            return parse(tag.getCompound("tag").getCompound("CustomBlock"));
+        }else {Bukkit.getLogger().warning("tag \"Tag \\ CustomBlock\" not find");}
 
         return this;
     }
@@ -168,72 +217,72 @@ public class HEState
         if(!BlockManager.material.name().equals(b.getType().name()))return null;
 
         setLocation(b.getLocation());
-        TileEntityCompoundApi api = GermHETools.libraryApi.getTileEntityCompoundApi(b);
-        NBTTagCompoundApi tagApi = api.getNBTTagCompound();
-        TagCompound<TagBase> tagBase = tagApi.getNBTTagCompoundApi();
-        if(tagBase.hasKey("CustomBlock"))
-            return parse(tagBase.getCompound("CustomBlock"));
+
+        NBTTagCompound tag = UtilNBT.getBlockNBT(b);
+
+        if(tag.hasKey("CustomBlock"))
+            return parse(tag.getCompound("CustomBlock"));
         return this;
     }
-    public HEState parse(TagCompound<? extends TagBase> tag)
+    public HEState parse(NBTTagCompound tag)
     {
-        if(tag.hasKey("enableGlowTexture")) {enableGlowTexture= tag.getByte("enableGlowTexture").getData() == 1;}
-        if(tag.hasKey("passable"))          {passable= tag.getByte("passable").getData() == 1;}
-        if(tag.hasKey("size"))              {size= tag.getDouble("size").getData();}
-        if(tag.hasKey("followStyle"))       {followStyle= tag.getString("followStyle").getData();}
-        if(tag.hasKey("glowTexture"))       {glowTexture= tag.getString("glowTexture").getData();}
-        if(tag.hasKey("model"))             {model= tag.getString("model").getData();}
-        if(tag.hasKey("texture"))           {texture= tag.getString("texture").getData();}
+        if(tag.hasKey("enableGlowTexture")) {enableGlowTexture= tag.getByte("enableGlowTexture") == 1;}
+        if(tag.hasKey("passable"))          {passable= tag.getByte("passable") == 1;}
+        if(tag.hasKey("size"))              {size= tag.getDouble("size");}
+        if(tag.hasKey("followStyle"))       {followStyle= tag.getString("followStyle");}
+        if(tag.hasKey("glowTexture"))       {glowTexture= tag.getString("glowTexture");}
+        if(tag.hasKey("model"))             {model= tag.getString("model");}
+        if(tag.hasKey("texture"))           {texture= tag.getString("texture");}
 
         if(tag.hasKey("aabb"))
         {
-            TagCompound<TagBase> layer = tag.getCompound("aabb");
+            NBTTagCompound layer = tag.getCompound("aabb");
             setAABB(
-                    layer.getDouble("minx").getData(),
-                    layer.getDouble("miny").getData(),
-                    layer.getDouble("minz").getData(),
-                    layer.getDouble("maxx").getData(),
-                    layer.getDouble("maxy").getData(),
-                    layer.getDouble("maxz").getData()
+                    layer.getDouble("minx"),
+                    layer.getDouble("miny"),
+                    layer.getDouble("minz"),
+                    layer.getDouble("maxx"),
+                    layer.getDouble("maxy"),
+                    layer.getDouble("maxz")
             );
         }
 
         if(tag.hasKey("rotate"))
         {
-            TagCompound<TagBase> layer = tag.getCompound("rotate");
+            NBTTagCompound layer = tag.getCompound("rotate");
             setRotate(
-                    layer.getDouble("pitch").getData(),
-                    layer.getDouble("roll").getData(),
-                    layer.getDouble("yaw").getData()
+                    layer.getDouble("pitch"),
+                    layer.getDouble("roll"),
+                    layer.getDouble("yaw")
             );
         }
 
         if(tag.hasKey("scale"))
         {
-            TagCompound<TagBase> layer = tag.getCompound("scale");
+            NBTTagCompound layer = tag.getCompound("scale");
             setScale(
-                    layer.getDouble("length").getData(),
-                    layer.getDouble("height").getData(),
-                    layer.getDouble("width").getData()
+                    layer.getDouble("length"),
+                    layer.getDouble("height"),
+                    layer.getDouble("width")
             );
         }
 
         if(tag.hasKey("translate"))
         {
-            TagCompound<TagBase> layer = tag.getCompound("translate");
+            NBTTagCompound layer = tag.getCompound("translate");
             setTransform(
-                    layer.getDouble("x").getData(),
-                    layer.getDouble("y").getData(),
-                    layer.getDouble("z").getData()
+                    layer.getDouble("x"),
+                    layer.getDouble("y"),
+                    layer.getDouble("z")
             );
         }
 
         if(tag.hasKey("materials"))
         {
-            TagCompound<TagBase> layer = tag.getCompound("materials");
+            NBTTagCompound layer = tag.getCompound("materials");
             material.clear();
-            for(String s : layer.getMap().keySet())
-                material.add(s+":"+layer.getString(s).getData());
+            for(String s : layer.c())
+                material.add(s+":"+layer.getString(s));
         }
         return this;
     }
@@ -252,4 +301,6 @@ public class HEState
     public HEState setAABB(double minx,double miny,double minz,double maxx, double maxy,double maxz){aabbMin.setX(minx).setY(miny).setZ(minz);aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
     public HEState setAABBMin(double minx,double miny,double minz){aabbMin.setX(minx).setY(miny).setZ(minz);return this;}
     public HEState setAABBMax(double maxx, double maxy,double maxz){aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
+    public HEState setId(String id) {this.id = id;return this;}
+    public HEState setName(String name) {this.name = name;return this;}
 }

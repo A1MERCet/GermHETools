@@ -5,8 +5,10 @@ import com.germ.germplugin.api.KeyType;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class PlayerState
 {
@@ -25,6 +27,7 @@ public class PlayerState
         return ps;
     }
 
+    public final HashMap<Integer,Integer> keyMap = new HashMap<>();
     public final Player player;
     public final String name;
     public GES ges;
@@ -42,6 +45,37 @@ public class PlayerState
         GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
         GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RETURN.getKeyId());
         GermPacketAPI.sendKeyRegister(player, KeyType.KEY_BACK.getKeyId());
+        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Z.getKeyId());
+    }
+
+    public void removeKey(int k)
+    {
+        keyMap.remove(k);
+    }
+    public void addKey(int k)
+    {
+        keyMap.put(k,k);
+        if(isGESEnable()){
+            if(hasKey(42))          ges.keyHandle(k,42);
+            else if(hasKey(29))     ges.keyHandle(k,29);
+            else if(hasKey(56))     ges.keyHandle(k,56);
+            else                       ges.keyHandle(k,-1);
+        }
+    }
+
+    /**
+     * <br>LSHIFT    = 42
+     * <br>LCTRL     = 29
+     * <br>LALT      = 56
+     * <br>SPACE     = 57
+     * <br>ENTER     = 28
+     * <br>ESC       = 1
+     * <br>TAB       = 15
+     * <br>~         = 41
+     */
+    public boolean hasKey(int k)
+    {
+        return keyMap.containsKey(k);
     }
 
     public boolean isGESEnable(){return ges!=null&&ges.enable;}

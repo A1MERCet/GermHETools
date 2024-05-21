@@ -1,4 +1,4 @@
-package net.mcbbs.a1mercet.germhetools.player.ges.gui.germ;
+package net.mcbbs.a1mercet.germhetools.gui.germ.effect;
 
 import com.germ.germplugin.api.dynamic.effect.GermEffectEntity;
 

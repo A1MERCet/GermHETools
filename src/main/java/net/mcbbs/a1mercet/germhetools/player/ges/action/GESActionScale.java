@@ -8,9 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
-public class GESActionRotate extends GESActionVector
+public class GESActionScale extends GESActionVector
 {
-    public GESActionRotate(GES ges)
+    public GESActionScale(GES ges)
     {
         super(ges,"ges_rotate", "GES-旋转", "ROTATE");
     }
@@ -23,7 +23,7 @@ public class GESActionRotate extends GESActionVector
         Vector cal = calVector();
 
         state.location.getBlock().setType(Material.AIR);
-        state.setRotate(cal.getX(),cal.getY(),cal.getZ());
+        state.setScale(cal.getX(),cal.getY(),cal.getZ());
         state.place();
         ges.setHEState(state.location.getBlock());
         return true;
@@ -36,7 +36,7 @@ public class GESActionRotate extends GESActionVector
         HEState state = getHEState();
         Vector cal = calVector();
 
-        state.setRotate(cal.getX(),cal.getY(),cal.getZ());
+        state.setScale(cal.getX(),cal.getY(),cal.getZ());
         state.place();
         ges.setHEState(state.location.getBlock());
         return true;
@@ -48,7 +48,7 @@ public class GESActionRotate extends GESActionVector
         HEState state = getHEState();
         if(state==null)return offset;
 
-        Vector rotate = state.rotate;
+        Vector rotate = state.scale;
         if(overwrite)   return new Vector(offset.getX(),offset.getY(),offset.getZ());
         else            return new Vector(rotate.getX()+offset.getX(),rotate.getY()+offset.getY(),rotate.getZ()+offset.getZ());
     }
@@ -63,9 +63,10 @@ public class GESActionRotate extends GESActionVector
 
         e.spawnToLocation(ges.ps.player, location.getX(),location.getY(),location.getZ());
         data.putDefault("effect",e);
-        ges.ps.player.sendMessage("旋转["+cal.toString()+"]");
+        ges.ps.player.sendMessage("缩放["+cal.toString()+"]");
     }
 
-    @Override public IGESAction createInstance(GES ges) {return new GESActionRotate(ges);}
-    @Override public SampleBuilderVector<? extends IGESAction> createBuilder() {return new SampleBuilderVector<GESActionRotate>(this);}
+    @Override public IGESAction createInstance(GES ges) {return new GESActionScale(ges);}
+
+    @Override public SampleBuilderVector<? extends IGESAction> createBuilder() {return new SampleBuilderVector<GESActionScale>(this);}
 }

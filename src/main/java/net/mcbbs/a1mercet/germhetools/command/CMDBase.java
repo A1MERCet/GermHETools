@@ -143,7 +143,7 @@ public abstract class CMDBase implements CommandExecutor
             ArgType[] anTypes = annotation.types();
 
             StringBuilder builder = new StringBuilder();
-            builder.append("/").append("audio").append(" ");
+            builder.append("/").append(name).append(" ");
             for(int i = 0;i<anArgs.length;i++)
                 if(anTypes[i]== ArgType.DEPEND)  builder.append(anArgs[i]).append("  ");
                 else                            builder.append("[").append(anArgs[i]).append("]  ");

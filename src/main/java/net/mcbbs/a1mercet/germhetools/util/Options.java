@@ -37,8 +37,8 @@ public class Options<K> extends HashMap<K, Options.IValue> implements Serializab
                 }catch (Exception e){e.printStackTrace();}
     }
 
-    public K transformKey(String k) {return null;}
-    public String toStringKey(K k)  {return null;}
+    public K transformKey(String k) {return (K)k;}
+    public String toStringKey(K k)  {return k.toString();}
 
     public enum Type
     {

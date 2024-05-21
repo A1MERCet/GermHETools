@@ -1,31 +1,38 @@
 package net.mcbbs.a1mercet.germhetools.util;
 
+import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 
 public class UtilNBT
 {
-    public static NBTTagCompound getNBTBlock(Block bukkitBlock)
+    public static org.bukkit.inventory.ItemStack saveItemNBT(org.bukkit.inventory.ItemStack bukkitItemStack , NBTTagCompound nbt)
     {
-        try {
-            CraftWorld world = (CraftWorld) bukkitBlock.getWorld();
-            TileEntity tile = world.getTileEntityAt(bukkitBlock.getX(),bukkitBlock.getY(),bukkitBlock.getZ());
-            NBTTagCompound tag = tile.save(new NBTTagCompound());
-            Bukkit.getLogger().warning(tile.getBlock().getName());
+        ItemStack isk = CraftItemStack.asNMSCopy(bukkitItemStack);
+        isk.load(nbt);
+        return CraftItemStack.asBukkitCopy(isk);
+    }
 
-            Bukkit.getLogger().warning("TTTTTTTTTTTTTTTTTTTTTTT");
-            printNBT(tag);
-            Bukkit.getLogger().warning("TTTTTTTTTTTTTTTTTTTTTTT");
-            tag.getCompound("CustomBlock").getCompound("scale").setDouble("width",0.1F);
-            tag.getCompound("CustomBlock").getCompound("scale").setDouble("length",0.1F);
-            tag.getCompound("CustomBlock").getCompound("scale").setDouble("height",0.1F);
+    public static NBTTagCompound getItemNBT(org.bukkit.inventory.ItemStack bukkitItemStack)
+    {
+        ItemStack isk = CraftItemStack.asNMSCopy(bukkitItemStack);
+        return isk.save(new NBTTagCompound());
+    }
 
-            tile.load(tag);
-        }catch (Exception e){e.printStackTrace();}
-        return null;
+    public static NBTTagCompound getBlockNBT(Block bukkitBlock)
+    {
+        TileEntity tile = ((CraftWorld) bukkitBlock.getWorld()).getTileEntityAt(bukkitBlock.getX(),bukkitBlock.getY(),bukkitBlock.getZ());
+        return tile.save(new NBTTagCompound());
+    }
+
+    public static void saveBlockNBT(Block bukkitBlock,NBTTagCompound nbt)
+    {
+        TileEntity tile = ((CraftWorld) bukkitBlock.getWorld()).getTileEntityAt(bukkitBlock.getX(),bukkitBlock.getY(),bukkitBlock.getZ());
+        tile.load(nbt);
     }
 
     public static void printNBT(String preFix , NBTTagCompound nbt)

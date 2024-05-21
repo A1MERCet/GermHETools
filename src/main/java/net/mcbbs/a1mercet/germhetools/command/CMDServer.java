@@ -1,18 +1,17 @@
 package net.mcbbs.a1mercet.germhetools.command;
 
-import com.germ.germplugin.api.dynamic.effect.GermEffectEntity;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
-import net.mcbbs.a1mercet.germhetools.player.ges.gui.germ.GSquareBox;
+import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
+import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
 import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
-import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
-import org.bukkit.Location;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.inventory.ItemStack;
 
 public class CMDServer extends CMDBase
 {
@@ -30,8 +29,14 @@ public class CMDServer extends CMDBase
     public void test(CommandSender sender)
     {
         Player p = (Player)sender;
-        PlayerState ps = PlayerState.get(p);
-        UtilNBT.getNBTBlock(UtilPlayer.rayTraceBlock(p.getLocation().add(0D,p.getEyeHeight(),0D),50D));
+        ItemStack isk = p.getInventory().getItemInMainHand();
+        NBTTagCompound nbt = UtilNBT.getItemNBT(isk);
+        UtilNBT.printNBT(nbt);
+        nbt.getCompound("tag").getCompound("CustomBlock").getCompound("scale").setDouble("width",0.1D);
+        nbt.getCompound("tag").getCompound("CustomBlock").getCompound("scale").setDouble("length",0.1D);
+        nbt.getCompound("tag").getCompound("CustomBlock").getCompound("scale").setDouble("height",0.1D);
+        p.getInventory().setItemInMainHand(UtilNBT.saveItemNBT(isk,nbt));
+        UtilNBT.printNBT(UtilNBT.getItemNBT(p.getInventory().getItemInMainHand()));
     }
 
     @CommandArgs(
@@ -47,6 +52,60 @@ public class CMDServer extends CMDBase
         if(ps.ges!=null)ps.ges.setEnable();
     }
 
+    public boolean gesCheck(PlayerState ps)
+    {
+        if(!ps.isGESEnable()){ps.player.sendMessage("GES未开启");return false;}
+        return true;
+    }
+
+    @CommandArgs(
+            describe    = "[GES]查看所有编辑器种类",
+            args        = {"ges","types"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND},
+            playerOnly = true
+    )
+    public void gesTypeList(CommandSender sender)
+    {
+        int i = 0;
+        for(String str : GESActionType.types.keySet())
+        {
+            IGESAction a = GESActionType.types.get(str);
+            sender.sendMessage("["+i+"] "+a.getType()+"(类型)"+" - "+a.getName()+"["+a.getID()+"]");
+            i++;
+        }
+    }
+
+    @CommandArgs(
+            describe    = "[GES]切换坐标编辑器" +
+                    "\n移动 - MOVE" +
+                    "\n旋转 - ROTATE" +
+                    "\n缩放 - SCALE"
+            ,
+            args        = {"ges","builder","类型"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND,ArgType.STRING}
+    )
+    public void gesBuilderMove(CommandSender sender,String type)
+    {
+        Player p = (Player)sender;
+        PlayerState ps = PlayerState.get(p);
+        if(!gesCheck(ps))return;
+        ps.ges.setBuilder(type);
+    }
+
+    @CommandArgs(
+            describe    = "[GES]取消编辑当前的方块",
+            args        = {"ges","remove"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND},
+            playerOnly = true
+    )
+    public void gesRemove(CommandSender sender)
+    {
+        Player p = (Player)sender;
+        PlayerState ps = PlayerState.get(p);
+        if(!gesCheck(ps))return;
+        ps.ges.removeHEState();
+    }
+
     @CommandArgs(
             describe    = "[GES]编辑准星指向的方块",
             args        = {"ges","pointer"} ,
@@ -57,42 +116,10 @@ public class CMDServer extends CMDBase
     {
         Player p = (Player)sender;
         PlayerState ps = PlayerState.get(p);
-        if(!ps.isGESEnable()){sender.sendMessage("GES未开启");return;}
+        if(!gesCheck(ps))return;
 
         if(!ps.ges.setHEStatePointer())
             sender.sendMessage("HEState不存在");
-    }
-
-    @CommandArgs(
-            describe    = "testx",
-            args        = {"testx"} ,
-            types       = {ArgType.DEPEND},
-            playerOnly = true
-    )
-    public void testX(CommandSender sender)
-    {
-        Player p = (Player)sender;
-        Block block = UtilPlayer.rayTraceBlock(p.getLocation(),100D);
-        if(block==null){sender.sendMessage("Block not found");return;}
-
-        Vector direction = p.getEyeLocation().getDirection();
-        Vector v = new Vector(Math.abs(direction.getX()),Math.abs(direction.getY()),Math.abs(direction.getZ()));
-
-        if(v.getX()>v.getZ()) {
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY(),block.getZ()+0D));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY()+1D,block.getZ()+0D));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY(),block.getZ()+1D));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY(),block.getZ()+2D));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY(),block.getZ()+3D));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY(),block.getZ()+4D));
-        }else {
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY(),block.getZ()));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX(),block.getY()+1D,block.getZ()));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX()+1D,block.getY(),block.getZ()));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX()+2D,block.getY(),block.getZ()));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX()+3D,block.getY(),block.getZ()));
-            new GSquareBox().spawnToLocation(p,new Location(block.getWorld(),block.getX()+4D,block.getY(),block.getZ()));
-        }
     }
 
     @CommandArgs(

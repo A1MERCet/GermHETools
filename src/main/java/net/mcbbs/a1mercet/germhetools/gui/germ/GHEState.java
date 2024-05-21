@@ -41,9 +41,9 @@ public class GHEState extends GermGuiBase
             super("material_quickly_panel");
             this.parent=parent;
 
-            addGuiPart(UtilGerm2K.createTexture("quickly_panel","aestus/he/material_quicklypanel.png",-4,-9));
-            addGuiPart(UtilGerm2K.createTexture("generate_panel","aestus/he/material_generate_panel.png",-4,61));
-            addGuiPart(UtilGerm2K.createTexture("mtl_panel","aestus/he/material_mtl_panel.png",-4,131));
+            addGuiPart(UtilGerm2K.createTexture("quickly_panel","aestus/he/edit/material_quicklypanel.png",-4,-9));
+            addGuiPart(UtilGerm2K.createTexture("generate_panel","aestus/he/edit/material_generate_panel.png",-4,61));
+            addGuiPart(UtilGerm2K.createTexture("mtl_panel","aestus/he/edit/material_mtl_panel.png",-4,131));
             addGuiPart(inputName
                     .setPreview("材质名/纹理名")
                     .registerCallbackHandler((p,i)->add(), GermGuiInput.EventType.ENTER));
@@ -60,11 +60,11 @@ public class GHEState extends GermGuiBase
             addGuiPart(inputMTLPath
                     .setPreview("纹理路径"));
 
-            addGuiPart(UtilGerm2K.createButton("add_material","aestus/he/material_quicklypanel_add.png",560,6)
+            addGuiPart(UtilGerm2K.createButton("add_material","aestus/he/edit/material_quicklypanel_add.png",560,6)
                     .registerCallbackHandler((p,b)->add(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("generate_material","aestus/he/material_quicklypanel_add.png",560,76)
+            addGuiPart(UtilGerm2K.createButton("generate_material","aestus/he/edit/material_quicklypanel_add.png",560,76)
                     .registerCallbackHandler((p,b)->generate(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("generate_mtl","aestus/he/material_quicklypanel_add.png",560,146)
+            addGuiPart(UtilGerm2K.createButton("generate_mtl","aestus/he/edit/material_quicklypanel_add.png",560,146)
                     .registerCallbackHandler((p,b)->generateMTL(), GermGuiButton.EventType.LEFT_CLICK));
         }
         public GMaterialBar add(){return add(inputName.getInput(),inputPath.getInput());}
@@ -115,12 +115,12 @@ public class GHEState extends GermGuiBase
         public GMaterials()
         {
             super("materials");
-            addGuiPart(UtilGerm2K.createTexture("tmaterials","aestus/he/materials.png"));
-            addGuiPart(UtilGerm2K.createButton("clear","aestus/he/clear.png",165,10,40,40)
+            addGuiPart(UtilGerm2K.createTexture("tmaterials","aestus/he/edit/materials.png"));
+            addGuiPart(UtilGerm2K.createButton("clear","aestus/he/edit/clear.png",165,10,40,40)
                     .registerCallbackHandler((p,b)->this.clear(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("add","aestus/he/material_add.png",530,10)
+            addGuiPart(UtilGerm2K.createButton("add","aestus/he/edit/material_add.png",530,10)
                     .registerCallbackHandler((p,b)->this.addMaterialBar(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("add_quickly","aestus/he/material_addquickly.png",385,10)
+            addGuiPart(UtilGerm2K.createButton("add_quickly","aestus/he/edit/material_addquickly.png",385,10)
                     .registerCallbackHandler((p,b)->{
                         if(GHEState.this.getGuiPart("material_quickly_panel")!=null)
                             GHEState.this.removeGuiPart("material_quickly_panel");
@@ -197,14 +197,14 @@ public class GHEState extends GermGuiBase
         public final GMaterials parent;
         public final GInput inputName = new GInput("input_name").setLocation(31,3).setSize(266,24);
         public final GInput inputPath = new GInput("input_path").setLocation(2,32).setSize(556,26);
-        public final GermGuiButton remove = UtilGerm2K.createButton("remove","aestus/he/material_remove.png",303,3)
+        public final GermGuiButton remove = UtilGerm2K.createButton("remove","aestus/he/edit/material_remove.png",303,3)
                 .registerCallbackHandler((p,b)->this.remove(), GermGuiButton.EventType.LEFT_CLICK);
 
         public GMaterialBar(GMaterials parent)
         {
             super("material_"+ UUID.randomUUID());
             this.parent=parent;
-            addGuiPart(UtilGerm2K.createTexture("main","aestus/he/material_bar.png"));
+            addGuiPart(UtilGerm2K.createTexture("main","aestus/he/edit/material_bar.png"));
             addGuiPart(inputName.setInput("材质名"));
             addGuiPart(inputPath.setInput("纹理路径"));
             addGuiPart(remove);
@@ -267,10 +267,10 @@ public class GHEState extends GermGuiBase
 
     protected final Player iplayer;
     protected final HEState state;
-    protected final GermGuiSlot slot = new GermGuiSlot("slot").setEmptyPath("aestus/he/air.png").setFillPath("aestus/he/air.png");
+    protected final GermGuiSlot slot = new GermGuiSlot("slot").setEmptyPath("aestus/he/edit/air.png").setFillPath("aestus/he/edit/air.png");
     protected final GermGuiLabel name = UtilGerm2K.createLabel("name","",690,28,1.75F);
     protected final GermGuiLabel name_space = UtilGerm2K.createLabel("name_space","",690,10,1F);
-    protected final GermGuiButton save = UtilGerm2K.createButton("save","aestus/he/save.png",45,1330).setEnable(false).registerCallbackHandler((p,b)->{callbackSave();}, GermGuiButton.EventType.LEFT_CLICK);
+    protected final GermGuiButton save = UtilGerm2K.createButton("save","aestus/he/edit/save.png",45,1330).setEnable(false).registerCallbackHandler((p,b)->{callbackSave();}, GermGuiButton.EventType.LEFT_CLICK);
     protected final GMaterials materials = new GMaterials();
     protected boolean hand;
     protected GInput focus;
@@ -290,7 +290,7 @@ public class GHEState extends GermGuiBase
             if(focus==null)return;
 
             if(focus instanceof GInputDouble){
-                double v = Double.parseDouble("0"+focus.getInput());
+                double v = Double.parseDouble(focus.getInput());
                 focus.setInput((v+1D)+"");
                 focus.onInput((v+1D)+"");
             }
@@ -300,7 +300,7 @@ public class GHEState extends GermGuiBase
             if(focus==null)return;
 
             if(focus instanceof GInputDouble){
-                double v = Double.parseDouble("0"+focus.getInput());
+                double v = Double.parseDouble(focus.getInput());
                 focus.setInput((v-1D)+"");
                 focus.onInput((v-1D)+"");
             }
@@ -325,9 +325,9 @@ public class GHEState extends GermGuiBase
 
         GermAnimationFade fade1 = new GermAnimationFade("fade").setFrom(0).setTo(1).setCycle(1).setDuration(300);
 
-        addGuiPart(UtilGerm2K.createTexture("main","aestus/he/main.png"));
-        addGuiPart(UtilGerm2K.createTexture("title","aestus/he/title.png",10,10));
-        addGuiPart(UtilGerm2K.createTexture("toptions","aestus/he/options.png",10,100));
+        addGuiPart(UtilGerm2K.createTexture("main","aestus/he/edit/main.png"));
+        addGuiPart(UtilGerm2K.createTexture("title","aestus/he/edit/title.png",10,10));
+        addGuiPart(UtilGerm2K.createTexture("toptions","aestus/he/edit/options.png",10,100));
         addGuiPart(UtilGerm2K.setLocation(materials,10,730));
 
         for(int i = 0;i<state.material.size();i++)
@@ -336,7 +336,7 @@ public class GHEState extends GermGuiBase
             Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->materials.addMaterialBar(state.material.get(finalI)),i/10);
         }
 
-        addGuiPart(UtilGerm2K.createTexture("showcase","aestus/he/showcase.png",610,10));
+        addGuiPart(UtilGerm2K.createTexture("showcase","aestus/he/edit/showcase.png",610,10));
         addGuiPart(name);
         addGuiPart(name_space);
 
@@ -373,7 +373,7 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("size") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.size=Double.parseDouble("0"+v);
+                    state.size=Double.parseDouble(v);
                 }
             }.setLocation(172,352).setSize(124,26)
                     .setInput(""+state.size));
@@ -385,20 +385,20 @@ public class GHEState extends GermGuiBase
                 }
             }.setLocation(454,352).setSize(556,26)
                     .setInput(state.followStyle));
-            addGuiPart(UtilGerm2K.createButton("follow_style_child","aestus/he/child.png",559,354).registerCallbackHandler((p,b)->{
+            addGuiPart(UtilGerm2K.createButton("follow_style_child","aestus/he/edit/child.png",559,354).registerCallbackHandler((p,b)->{
                 GermGuiCanvas c = new GermGuiCanvas("c");
                 addGuiPart(c);
                 UtilGerm2K.setLocation(c,454,378);
-                c.addGuiPart(UtilGerm2K.createButton("close","aestus/he/air.png",-50000,-50000,50000,50000).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("close","aestus/he/edit/air.png",-50000,-50000,50000,50000).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                 }, GermGuiButton.EventType.LEFT_CLICK));
 
                 int index = 0;
 
-                GermGuiTexture list = UtilGerm2K.createTexture("list","aestus/he/child_list",0,0);
+                GermGuiTexture list = UtilGerm2K.createTexture("list","aestus/he/edit/child_list",0,0);
 
                 c.addGuiPart(list);
-                c.addGuiPart(UtilGerm2K.createButton("button_static","aestus/he/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_static","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="static";
                     ((GInput)getGuiPart("follow_style")).setInput("static");
@@ -406,7 +406,7 @@ public class GHEState extends GermGuiBase
                 c.addGuiPart(UtilGerm2K.createLabel("label_static","static",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
                 index++;
 
-                c.addGuiPart(UtilGerm2K.createButton("button_4","aestus/he/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_4","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="4f";
                     ((GInput)getGuiPart("follow_style")).setInput("4f");
@@ -414,7 +414,7 @@ public class GHEState extends GermGuiBase
                 c.addGuiPart(UtilGerm2K.createLabel("label_4","4f",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
                 index++;
 
-                c.addGuiPart(UtilGerm2K.createButton("button_8","aestus/he/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_8","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="8f";
                     ((GInput)getGuiPart("follow_style")).setInput("8f");
@@ -422,7 +422,7 @@ public class GHEState extends GermGuiBase
                 c.addGuiPart(UtilGerm2K.createLabel("label_8","8f",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
                 index++;
 
-                c.addGuiPart(UtilGerm2K.createButton("button_16","aestus/he/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_16","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="16f";
                     ((GInput)getGuiPart("follow_style")).setInput("16f");
@@ -433,9 +433,9 @@ public class GHEState extends GermGuiBase
                 UtilGerm2K.setSize(list,128,4+index*28);
             }, GermGuiButton.EventType.LEFT_CLICK));
 
-            addGuiPart(UtilGerm2K.createButton("passable",state.passable?"aestus/he/true.png":"aestus/he/false.png",275,392,16,16).registerCallbackHandler((p,b)->{
+            addGuiPart(UtilGerm2K.createButton("passable",state.passable?"aestus/he/edit/true.png":"aestus/he/edit/false.png",275,392,16,16).registerCallbackHandler((p,b)->{
                 state.passable=!state.passable;
-                b.setDefaultPath(state.passable?"aestus/he/true.png":"aestus/he/false.png");
+                b.setDefaultPath(state.passable?"aestus/he/edit/true.png":"aestus/he/edit/false.png");
             }, GermGuiButton.EventType.LEFT_CLICK));
         }
 
@@ -444,21 +444,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("bb_minx") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMin.setX(Float.parseFloat("0"+v));
+                    state.aabbMin.setX(Float.parseFloat(v));
                 }
             }.setLocation(50,497).setSize(60,26)
                     .setInput(""+state.aabbMin.getX()));
             addGuiPart(new GInputDouble("bb_miny") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMin.setY(Float.parseFloat("0"+v));
+                    state.aabbMin.setY(Float.parseFloat(v));
                 }
             }.setLocation(237,497).setSize(60,26)
                     .setInput(""+state.aabbMin.getY()));
             addGuiPart(new GInputDouble("bb_minz") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMin.setZ(Float.parseFloat("0"+v));
+                    state.aabbMin.setZ(Float.parseFloat(v));
                 }
             }.setLocation(424,497).setSize(60,26)
                     .setInput(""+state.aabbMin.getZ()));
@@ -466,21 +466,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("bb_maxx") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMax.setX(Float.parseFloat("0"+v));
+                    state.aabbMax.setX(Float.parseFloat(v));
                 }
             }.setLocation(140,497).setSize(60,26)
                     .setInput(""+state.aabbMax.getX()));
             addGuiPart(new GInputDouble("bb_maxy") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMax.setY(Float.parseFloat("0"+v));
+                    state.aabbMax.setY(Float.parseFloat(v));
                 }
             }.setLocation(327,497).setSize(60,26)
                     .setInput(""+state.aabbMax.getY()));
             addGuiPart(new GInputDouble("bb_maxz") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMax.setZ(Float.parseFloat("0"+v));
+                    state.aabbMax.setZ(Float.parseFloat(v));
                 }
             }.setLocation(514,497).setSize(60,26)
                     .setInput(""+state.aabbMax.getZ()));
@@ -491,21 +491,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("offset_x") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.transform.setX(Float.parseFloat("0"+v));
+                    state.transform.setX(Float.parseFloat(v));
                 }
             }.setLocation(104,607).setSize(68,26)
                     .setInput(""+state.transform.getX()));
             addGuiPart(new GInputDouble("offset_y") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.transform.setY(Float.parseFloat("0"+v));
+                    state.transform.setY(Float.parseFloat(v));
                 }
             }.setLocation(226,607).setSize(68,26)
                     .setInput(""+state.transform.getY()));
             addGuiPart(new GInputDouble("offset_z") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.transform.setZ(Float.parseFloat("0"+v));
+                    state.transform.setZ(Float.parseFloat(v));
                 }
             }.setLocation(348,607).setSize(68,26)
                     .setInput(""+state.transform.getZ()));
@@ -513,21 +513,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("rotate_pitch") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.rotate.setX(Float.parseFloat("0"+v));
+                    state.rotate.setX(Float.parseFloat(v));
                 }
             }.setLocation(104,642).setSize(68,26)
                     .setInput(""+state.rotate.getX()));
             addGuiPart(new GInputDouble("rotate_yaw") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.rotate.setY(Float.parseFloat("0"+v));
+                    state.rotate.setY(Float.parseFloat(v));
                 }
             }.setLocation(226,642).setSize(68,26)
                     .setInput(""+state.rotate.getY()));
             addGuiPart(new GInputDouble("rotate_roll") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.rotate.setZ(Float.parseFloat("0"+v));
+                    state.rotate.setZ(Float.parseFloat(v));
                 }
             }.setLocation(348,642).setSize(68,26)
                     .setInput(""+state.rotate.getZ()));
@@ -535,21 +535,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("scale_length") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.scale.setX(Float.parseFloat("0"+v));
+                    state.scale.setX(Float.parseFloat(v));
                 }
             }.setLocation(104,677).setSize(68,26)
                     .setInput(""+state.scale.getX()));
             addGuiPart(new GInputDouble("scale_width") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.scale.setY(Float.parseFloat("0"+v));
+                    state.scale.setY(Float.parseFloat(v));
                 }
             }.setLocation(226,677).setSize(68,26)
                     .setInput(""+state.scale.getY()));
             addGuiPart(new GInputDouble("scale_height") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.scale.setZ(Float.parseFloat("0"+v));
+                    state.scale.setZ(Float.parseFloat(v));
                 }
             }.setLocation(348,677).setSize(68,26)
                     .setInput(""+state.scale.getZ()));
@@ -557,21 +557,21 @@ public class GHEState extends GermGuiBase
 
         //clear
         {
-            addGuiPart(UtilGerm2K.createButton("reset","aestus/he/clear.png",520,20,60,60)
+            addGuiPart(UtilGerm2K.createButton("reset","aestus/he/edit/clear.png",520,20,60,60)
                     .registerCallbackHandler((p,b)->{
 
                         HEState s = new HEState().setLocation(state.location);
                         HEGuiManager.createHEStateGui(p,s,hand).openGuiTo(p);
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("remove_glow","aestus/he/remove.png",552,317,26,26)
+            addGuiPart(UtilGerm2K.createButton("remove_glow","aestus/he/edit/remove.png",552,317,26,26)
                     .registerCallbackHandler((p,b)->{
 
                         ((GInput)getGuiPart("glow_path")).setInput("");
                         state.glowTexture="";
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("clear_base","aestus/he/clear.png",175,110,40,40)
+            addGuiPart(UtilGerm2K.createButton("clear_base","aestus/he/edit/clear.png",175,110,40,40)
                     .registerCallbackHandler((p,b)->{
 
                         state.model="";
@@ -584,10 +584,10 @@ public class GHEState extends GermGuiBase
                         ((GInput)getGuiPart("texture_path")).setInput("");
                         ((GInput)getGuiPart("glow_path")).setInput("");
                         ((GInput)getGuiPart("follow_style")).setInput("static");
-                        b.setDefaultPath(state.passable?"aestus/he/true.png":"aestus/he/false.png");
+                        b.setDefaultPath(state.passable?"aestus/he/edit/true.png":"aestus/he/edit/false.png");
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("clear_bb","aestus/he/clear.png",175,450,40,40)
+            addGuiPart(UtilGerm2K.createButton("clear_bb","aestus/he/edit/clear.png",175,450,40,40)
                     .registerCallbackHandler((p,b)->{
 
                         state.aabbMax.setX(1).setY(1).setZ(1);
@@ -601,7 +601,7 @@ public class GHEState extends GermGuiBase
                         ((GInput)getGuiPart("bb_maxz")).setInput("1.0");
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("clear_offset","aestus/he/clear.png",175,560,40,40)
+            addGuiPart(UtilGerm2K.createButton("clear_offset","aestus/he/edit/clear.png",175,560,40,40)
                     .registerCallbackHandler((p,b)->{
 
                         state.transform.setX(0).setY(0).setZ(0);
@@ -626,12 +626,12 @@ public class GHEState extends GermGuiBase
         //options
         {
 
-            addGuiPart(UtilGerm2K.createButton("createitem","aestus/he/createitem.png",850,535)
+            addGuiPart(UtilGerm2K.createButton("createitem","aestus/he/edit/createitem.png",850,535)
                     .registerCallbackHandler((p,b)->{
                         iplayer.getInventory().addItem(state.createItemStack());
                         iplayer.sendMessage("已添加至物品栏");
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("savepreset","aestus/he/savepreset.png",685,535)
+            addGuiPart(UtilGerm2K.createButton("savepreset","aestus/he/edit/savepreset.png",685,535)
                     .registerCallbackHandler((p,b)->{
                     }, GermGuiButton.EventType.LEFT_CLICK));
         }
@@ -671,9 +671,9 @@ public class GHEState extends GermGuiBase
             boolean r = state.place();
             iplayer.teleport(new Location(iplayer.getWorld(),1000D,1000D,1000D));
 
-            Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(), chunk::unload,5);
-            Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(), chunk::load,15);
-            Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->iplayer.teleport(playerLocation),30);
+            chunk.unload();
+            chunk.load();
+            Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->iplayer.teleport(playerLocation),4);
             iplayer.sendMessage(r?"已保存":"保存失败");
         }
 

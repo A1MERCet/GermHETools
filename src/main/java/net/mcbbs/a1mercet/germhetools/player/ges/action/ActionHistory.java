@@ -42,15 +42,15 @@ public class ActionHistory
         return this;
     }
 
-    public ActionHistory recovery()
+    public IGESAction recovery()
     {
-        if(recovery.size()==0)return this;
+        if(recovery.size()==0)return null;
 
         IGESAction action = recovery.get(recovery.size()-1);
         action.onApply(parent);
         history.add(action);
 
-        return this;
+        return action;
     }
 
     public int getHistorySize(){return Config.historySize;}
