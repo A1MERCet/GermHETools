@@ -129,15 +129,15 @@ public class UtilGerm2K
     }
     public static GermGuiLabel createLabel(String name , String text , int x , int y)
     {
-        return new GermGuiLabel(name).setShadow(true).setText(text).setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h").setFont("bender").setFontSize(48);
+        return new GermGuiLabel(name).setShadow(true).setText(text).setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h").setFont("font").setFontSize(48);
     }
     public static GermGuiLabel createLabel(String name , String text , int x , int y , float scale)
     {
-        return new GermGuiLabel(name).setShadow(true).setText(text).setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h").setFont("bender").setFontSize(48).setScale(scale+"/2560*w");
+        return new GermGuiLabel(name).setShadow(true).setText(text).setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h").setFont("font").setFontSize(48).setScale(scale+"/2560*w");
     }
     public static GermGuiLabel createLabel(String name , String text , int x , int y , float scale, GermGuiLabel.Align align)
     {
-        return new GermGuiLabel(name).setShadow(true).setText(text).setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h").setFont("bender").setFontSize(48).setScale(scale+"/2560*w").setAlign(align);
+        return new GermGuiLabel(name).setShadow(true).setText(text).setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h").setFont("font").setFontSize(48).setScale(scale+"/2560*w").setAlign(align);
     }
     public static GermGuiTexture createTexture(String name , String path)
     {
@@ -224,5 +224,16 @@ public class UtilGerm2K
                 .setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h")
                 .setWidth("tw1/2560*w").setHeight("th1/1440*h")
                 .setClickSound("tarz:menu.button_click2").setHoverSound("tarz:menu.button_hov2");
+    }
+    public static GermGuiButton createButtonBG(String name , String path , int x , int y)
+    {
+        return new GermGuiButton(name).setDefaultPath(path).setHoverPath(path)
+                .setLocationX(x/2560F+"*w").setLocationY(y/1440F+"*h")
+                .setWidth("tw1/2560*w").setHeight("th1/1440*h").setSwallow(true).setInvalid(true);
+    }
+    public static GermGuiButton createButtonBG(String name , String path)
+    {
+        return new GermGuiButton(name).setDefaultPath(path).setHoverPath(path)
+                .setWidth("tw1/2560*w").setHeight("th1/1440*h").setSwallow(true).setInvalid(true);
     }
 }

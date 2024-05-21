@@ -2,15 +2,20 @@ package net.mcbbs.a1mercet.germhetools.player;
 
 import com.germ.germplugin.api.GermPacketAPI;
 import com.germ.germplugin.api.KeyType;
+import net.mcbbs.a1mercet.germhetools.Config;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
+import net.mcbbs.a1mercet.germhetools.util.IConfig;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlayerState
+public class PlayerState implements IConfig
 {
     public static HashMap<String,PlayerState> players = new HashMap<>();
     public static Collection<PlayerState> values()  {return players.values();}
@@ -27,25 +32,19 @@ public class PlayerState
         return ps;
     }
 
-    public final HashMap<Integer,Integer> keyMap = new HashMap<>();
+
+
     public final Player player;
     public final String name;
-    public GES ges;
+
+    public final HashMap<Integer,Integer> keyMap    = new HashMap<>();
+    public boolean allowGES                         = false;
+    public GES ges                                  = null;
 
     public PlayerState(Player player)
     {
         this.player = player;
         this.name = player.getName();
-        this.ges = new GES(this);
-
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_UP.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DOWN.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LEFT.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RIGHT.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RETURN.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_BACK.getKeyId());
-        GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Z.getKeyId());
     }
 
     public void removeKey(int k)
@@ -60,6 +59,24 @@ public class PlayerState
             else if(hasKey(29))     ges.keyHandle(k,29);
             else if(hasKey(56))     ges.keyHandle(k,56);
             else                       ges.keyHandle(k,-1);
+        }
+    }
+
+    public void initGES()
+    {
+        if(!allowGES)return;
+
+        if(player!=null)
+        {
+            ges = new GES(this);
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_UP.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DOWN.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LEFT.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RIGHT.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RETURN.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_BACK.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Z.getKeyId());
         }
     }
 
@@ -79,4 +96,50 @@ public class PlayerState
     }
 
     public boolean isGESEnable(){return ges!=null&&ges.enable;}
+
+
+    @Override public String getDefaultPath() {return name;}
+
+    public void save()
+    {
+        String path = Config.path+"\\player\\"+name+".yml";
+        File file = new File(path);
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        save(cfg.createSection(getDefaultPath()));
+
+        try {cfg.save(file);}catch (Exception e){e.printStackTrace();}
+    }
+
+    public void load()
+    {
+        String path = Config.path+"\\player\\"+name+".yml";
+        File file = new File(path);
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        load(cfg.getConfigurationSection(getDefaultPath()) == null?cfg.createSection(getDefaultPath()):cfg.getConfigurationSection(getDefaultPath()));
+
+    }
+
+    @Override
+    public void save(ConfigurationSection section)
+    {
+        section.set("AllowGES",allowGES);
+        if(ges!=null)
+        {
+            section.set(ges.library.getDefaultPath(),null);
+            ges.library.save(section.createSection(ges.library.getDefaultPath()));
+        }
+    }
+
+    @Override
+    public void load(ConfigurationSection section)
+    {
+        allowGES = section.getBoolean("AllowGES");
+        initGES();
+
+        if(ges!=null && section.getConfigurationSection(ges.library.getDefaultPath())!=null)
+        {
+            ges.library.load(section.getConfigurationSection(ges.library.getDefaultPath()));
+        }
+    }
 }

@@ -2,12 +2,14 @@ package net.mcbbs.a1mercet.germhetools.command;
 
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
+import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
 import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -164,4 +166,43 @@ public class CMDServer extends CMDBase
         HEGuiManager.createHEStateGui(p,new HEState().parse(b),true).openGuiTo(p);
     }
 
+    @CommandArgs(
+            describe    = "打开预设界面",
+            args        = {"gui","preset"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND},
+            playerOnly = true
+    )
+    public void openPreset(CommandSender sender)
+    {
+        Player p = (Player) sender;
+        new GPresetLibrary(PlayerState.get(p)).openGuiTo(p);
+    }
+
+    @CommandArgs(
+            describe    = "保存玩家数据",
+            args        = {"player","save","id"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND,ArgType.STRING}
+    )
+    public void savePlayer(CommandSender sender,String p)
+    {
+        PlayerState ps = PlayerState.get(p);
+        if(ps==null){sender.sendMessage("玩家不存在");return;}
+        ps.save();
+    }
+    @CommandArgs(
+            describe    = "重载玩家数据",
+            args        = {"player","load","id"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND,ArgType.STRING}
+    )
+    public void loadPlayer(CommandSender sender,String p)
+    {
+        PlayerState ps = PlayerState.get(p);
+        if(ps==null){sender.sendMessage("玩家不存在");return;}
+
+        PlayerState.remove(ps);
+
+        ps = PlayerState.create(Bukkit.getPlayerExact(p));
+
+        ps.load();
+    }
 }

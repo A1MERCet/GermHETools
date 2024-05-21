@@ -7,9 +7,12 @@ import com.germ.germplugin.api.dynamic.animation.IAnimatable;
 import com.germ.germplugin.api.dynamic.gui.*;
 import net.mcbbs.a1mercet.germhetools.GermHETools;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
+import net.mcbbs.a1mercet.germhetools.api.event.HEStateSaveEvent;
 import net.mcbbs.a1mercet.germhetools.he.HEManager;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
+import net.mcbbs.a1mercet.germhetools.player.PlayerState;
+import net.mcbbs.a1mercet.germhetools.player.ges.PresetLibrary;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -111,7 +114,7 @@ public class GHEState extends GermGuiBase
                 .setScrollableV("0/1440*w")
                 .setSliderV(new GermGuiColor("sliderV").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"))
                 .setSliderH(new GermGuiColor("sliderH").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"));
-        public final GermGuiLabel amount = UtilGerm2K.createLabel("amount","0",215,10,1.4F);
+        public final GermGuiLabel amount = UtilGerm2K.createLabel("amount","0",215,10,2F);
         public GMaterials()
         {
             super("materials");
@@ -268,8 +271,8 @@ public class GHEState extends GermGuiBase
     protected final Player iplayer;
     protected final HEState state;
     protected final GermGuiSlot slot = new GermGuiSlot("slot").setEmptyPath("aestus/he/edit/air.png").setFillPath("aestus/he/edit/air.png");
-    protected final GermGuiLabel name = UtilGerm2K.createLabel("name","",690,28,1.75F);
-    protected final GermGuiLabel name_space = UtilGerm2K.createLabel("name_space","",690,10,1F);
+    protected final GermGuiLabel name = UtilGerm2K.createLabel("name","",690,28,2.5F);
+    protected final GermGuiLabel name_space = UtilGerm2K.createLabel("name_space","",690,10,1.5F);
     protected final GermGuiButton save = UtilGerm2K.createButton("save","aestus/he/edit/save.png",45,1330).setEnable(false).registerCallbackHandler((p,b)->{callbackSave();}, GermGuiButton.EventType.LEFT_CLICK);
     protected final GMaterials materials = new GMaterials();
     protected boolean hand;
@@ -290,7 +293,7 @@ public class GHEState extends GermGuiBase
             if(focus==null)return;
 
             if(focus instanceof GInputDouble){
-                double v = Double.parseDouble(focus.getInput());
+                double v = "".equals(focus.getInput())?0D:Double.parseDouble(focus.getInput());
                 focus.setInput((v+1D)+"");
                 focus.onInput((v+1D)+"");
             }
@@ -300,7 +303,7 @@ public class GHEState extends GermGuiBase
             if(focus==null)return;
 
             if(focus instanceof GInputDouble){
-                double v = Double.parseDouble(focus.getInput());
+                double v = "".equals(focus.getInput())?0D:Double.parseDouble(focus.getInput());
                 focus.setInput((v-1D)+"");
                 focus.onInput((v-1D)+"");
             }
@@ -373,7 +376,7 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("size") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.size=Double.parseDouble(v);
+                    state.size=v==null||"".equals(v)?0D:Double.parseDouble(v);
                 }
             }.setLocation(172,352).setSize(124,26)
                     .setInput(""+state.size));
@@ -403,7 +406,7 @@ public class GHEState extends GermGuiBase
                     state.followStyle="static";
                     ((GInput)getGuiPart("follow_style")).setInput("static");
                 }, GermGuiButton.EventType.LEFT_CLICK));
-                c.addGuiPart(UtilGerm2K.createLabel("label_static","static",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
+                c.addGuiPart(UtilGerm2K.createLabel("label_static","static",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
                 c.addGuiPart(UtilGerm2K.createButton("button_4","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
@@ -411,7 +414,7 @@ public class GHEState extends GermGuiBase
                     state.followStyle="4f";
                     ((GInput)getGuiPart("follow_style")).setInput("4f");
                 }, GermGuiButton.EventType.LEFT_CLICK));
-                c.addGuiPart(UtilGerm2K.createLabel("label_4","4f",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
+                c.addGuiPart(UtilGerm2K.createLabel("label_4","4f",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
                 c.addGuiPart(UtilGerm2K.createButton("button_8","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
@@ -419,7 +422,7 @@ public class GHEState extends GermGuiBase
                     state.followStyle="8f";
                     ((GInput)getGuiPart("follow_style")).setInput("8f");
                 }, GermGuiButton.EventType.LEFT_CLICK));
-                c.addGuiPart(UtilGerm2K.createLabel("label_8","8f",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
+                c.addGuiPart(UtilGerm2K.createLabel("label_8","8f",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
                 c.addGuiPart(UtilGerm2K.createButton("button_16","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
@@ -427,7 +430,7 @@ public class GHEState extends GermGuiBase
                     state.followStyle="16f";
                     ((GInput)getGuiPart("follow_style")).setInput("16f");
                 }, GermGuiButton.EventType.LEFT_CLICK));
-                c.addGuiPart(UtilGerm2K.createLabel("label_16","16f",64,4+index*28,1F, GermGuiLabel.Align.CENTER));
+                c.addGuiPart(UtilGerm2K.createLabel("label_16","16f",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
                 UtilGerm2K.setSize(list,128,4+index*28);
@@ -444,21 +447,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("bb_minx") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMin.setX(Float.parseFloat(v));
+                    state.aabbMin.setX(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(50,497).setSize(60,26)
                     .setInput(""+state.aabbMin.getX()));
             addGuiPart(new GInputDouble("bb_miny") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMin.setY(Float.parseFloat(v));
+                    state.aabbMin.setY(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(237,497).setSize(60,26)
                     .setInput(""+state.aabbMin.getY()));
             addGuiPart(new GInputDouble("bb_minz") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMin.setZ(Float.parseFloat(v));
+                    state.aabbMin.setZ(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(424,497).setSize(60,26)
                     .setInput(""+state.aabbMin.getZ()));
@@ -466,21 +469,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("bb_maxx") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMax.setX(Float.parseFloat(v));
+                    state.aabbMax.setX(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(140,497).setSize(60,26)
                     .setInput(""+state.aabbMax.getX()));
             addGuiPart(new GInputDouble("bb_maxy") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMax.setY(Float.parseFloat(v));
+                    state.aabbMax.setY(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(327,497).setSize(60,26)
                     .setInput(""+state.aabbMax.getY()));
             addGuiPart(new GInputDouble("bb_maxz") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.aabbMax.setZ(Float.parseFloat(v));
+                    state.aabbMax.setZ(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(514,497).setSize(60,26)
                     .setInput(""+state.aabbMax.getZ()));
@@ -491,21 +494,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("offset_x") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.transform.setX(Float.parseFloat(v));
+                    state.transform.setX(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(104,607).setSize(68,26)
                     .setInput(""+state.transform.getX()));
             addGuiPart(new GInputDouble("offset_y") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.transform.setY(Float.parseFloat(v));
+                    state.transform.setY(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(226,607).setSize(68,26)
                     .setInput(""+state.transform.getY()));
             addGuiPart(new GInputDouble("offset_z") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.transform.setZ(Float.parseFloat(v));
+                    state.transform.setZ(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(348,607).setSize(68,26)
                     .setInput(""+state.transform.getZ()));
@@ -513,21 +516,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("rotate_pitch") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.rotate.setX(Float.parseFloat(v));
+                    state.rotate.setX(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(104,642).setSize(68,26)
                     .setInput(""+state.rotate.getX()));
             addGuiPart(new GInputDouble("rotate_yaw") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.rotate.setY(Float.parseFloat(v));
+                    state.rotate.setY(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(226,642).setSize(68,26)
                     .setInput(""+state.rotate.getY()));
             addGuiPart(new GInputDouble("rotate_roll") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.rotate.setZ(Float.parseFloat(v));
+                    state.rotate.setZ(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(348,642).setSize(68,26)
                     .setInput(""+state.rotate.getZ()));
@@ -535,21 +538,21 @@ public class GHEState extends GermGuiBase
             addGuiPart(new GInputDouble("scale_length") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.scale.setX(Float.parseFloat(v));
+                    state.scale.setX(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(104,677).setSize(68,26)
                     .setInput(""+state.scale.getX()));
             addGuiPart(new GInputDouble("scale_width") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.scale.setY(Float.parseFloat(v));
+                    state.scale.setY(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(226,677).setSize(68,26)
                     .setInput(""+state.scale.getY()));
             addGuiPart(new GInputDouble("scale_height") {
                 @Override public void onInput(String v) {
                     super.onInput(v);
-                    state.scale.setZ(Float.parseFloat(v));
+                    state.scale.setZ(v==null||"".equals(v)?0F:Float.parseFloat(v));
                 }
             }.setLocation(348,677).setSize(68,26)
                     .setInput(""+state.scale.getZ()));
@@ -633,6 +636,7 @@ public class GHEState extends GermGuiBase
                     }, GermGuiButton.EventType.LEFT_CLICK));
             addGuiPart(UtilGerm2K.createButton("savepreset","aestus/he/edit/savepreset.png",685,535)
                     .registerCallbackHandler((p,b)->{
+                        callbackSavePreset();
                     }, GermGuiButton.EventType.LEFT_CLICK));
         }
 
@@ -664,7 +668,7 @@ public class GHEState extends GermGuiBase
             int a = iplayer.getInventory().getItemInMainHand().getAmount();
             iplayer.getInventory().setItemInMainHand(state.createItemStack());
             iplayer.getInventory().getItemInMainHand().setAmount(a);
-        }else {
+        }else if(state.location.getWorld()!=null) {
             Location playerLocation = iplayer.getLocation();
 
             Chunk chunk = state.location.getChunk();
@@ -675,6 +679,135 @@ public class GHEState extends GermGuiBase
             chunk.load();
             Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->iplayer.teleport(playerLocation),4);
             iplayer.sendMessage(r?"已保存":"保存失败");
+        }
+
+        HEStateSaveEvent evt = new HEStateSaveEvent(iplayer,state);
+        Bukkit.getServer().getPluginManager().callEvent(evt);
+    }
+    protected void callbackSavePreset()
+    {
+        PlayerState ps = PlayerState.get(iplayer);
+
+        new GAddPreset(ps, state).openChildGuiTo(iplayer);
+    }
+
+    public static class GAddPreset extends GermGuiBase
+    {
+        public final PlayerState ps;
+        public final HEState state;
+        public String id,name,category;
+
+        public final GermGuiButton scrollTex = UtilGerm2K.createButtonBG("bg","aestus/he/edit/add_preset_list.png",371,55).setEnable(false);
+        public final GermGuiScroll scroll = new GermGuiScroll("scroll")
+                .setWidth("168/2560*w").setHeight("191/1440*h")
+                .setLocationX("377/2560*w").setLocationY("60/1440*h")
+                .setRelative(true).setScrollDraggable(true)
+                .setInvalidV(false).setInvalidH(true)
+                .setScrollableV("500/1440*w")
+                .setSliderV(new GermGuiColor("sliderV").setEndColor(0xFF232323).setColor(0xFF232323).setWidth("6/2560*w").setHeight("50/1440*h"))
+                .setSliderH(new GermGuiColor("sliderH").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"))
+                .setWidthV("10/2560*w").setHeightV("(191-50)/1440*h").setEnable(false);
+
+
+        public final GermGuiInput inputID           = new GermGuiInput("input_id")
+                .setPermanentFocus(false).setPreview("ID").setSync(true).setSwallow(true).setAutoClear(false)
+                .setBackground(false).setWidth("178/2560*w").setHeight("40/1440*h").setLocationX("-6/2560*w").setLocationY("15/1440*h");
+        public final GermGuiInput inputName         = new GermGuiInput("input_name")
+                .setPermanentFocus(false).setPreview("显示名").setSync(true).setSwallow(true).setAutoClear(false)
+                .setBackground(false).setWidth("178/2560*w").setHeight("40/1440*h").setLocationX("179/2560*w").setLocationY("15/1440*h");
+        public final GermGuiInput inputCategory     = new GermGuiInput("input_Category")
+                .setPermanentFocus(false).setPreview("收藏夹").setSync(true).setSwallow(true).setAutoClear(false)
+                .setBackground(false).setWidth("178/2560*w").setHeight("40/1440*h").setLocationX("362/2560*w").setLocationY("15/1440*h");
+        public final GermGuiButton types            = UtilGerm2K.createButton("types","aestus/he/edit/add_preset_types.png",532,8)
+                .registerCallbackHandler((p,b)->{
+                    scroll.setEnable(!scroll.isEnable());
+                    scrollTex.setEnable(!scrollTex.isEnable());
+                }, GermGuiButton.EventType.LEFT_CLICK);
+        public final GermGuiButton confirm          = UtilGerm2K.createButton("confirm","aestus/he/edit/material_quicklypanel_add.png",560,6)
+                .registerCallbackHandler((p,b)->confirm(), GermGuiButton.EventType.LEFT_CLICK);
+
+        public GAddPreset(PlayerState ps , HEState state)
+        {
+            super("addpreset");
+            this.ps=ps;
+            this.state=state;
+            init();
+
+            PresetLibrary.PresetList list = ps.ges.library.getList("默认目录");
+            if(list!=null)inputCategory.setInput(list.category);
+        }
+        protected void init()
+        {
+            getOptions().setStartX("1280/2560*w").setStartY("690/1440*h");
+            addGuiPart(UtilGerm2K.createButton("close","aestus/he/air.png",-5000,-5000,10000,10000)
+                    .registerCallbackHandler((p,b)->close(), GermGuiButton.EventType.LEFT_CLICK));
+            addGuiPart(UtilGerm2K.createButtonBG("mainbg","aestus/he/edit/addpreset.png",-4,-9));
+            addGuiPart(inputID
+                    .registerCallbackHandler((p,b)->inputID(inputID.getInput()), GermGuiInput.EventType.INPUT)
+                    .registerCallbackHandler((p,b)->inputID(inputID.getInput()), GermGuiInput.EventType.LOSE_FOCUS)
+                    .registerCallbackHandler((p,b)->inputID(inputID.getInput()), GermGuiInput.EventType.ENTER));
+            addGuiPart(inputName
+                    .registerCallbackHandler((p,b)->inputName(inputName.getInput()), GermGuiInput.EventType.INPUT)
+                    .registerCallbackHandler((p,b)->inputName(inputName.getInput()), GermGuiInput.EventType.LOSE_FOCUS)
+                    .registerCallbackHandler((p,b)->inputName(inputName.getInput()), GermGuiInput.EventType.ENTER));
+            addGuiPart(inputCategory
+                    .registerCallbackHandler((p,b)->inputCategory(inputCategory.getInput()), GermGuiInput.EventType.INPUT)
+                    .registerCallbackHandler((p,b)->inputCategory(inputCategory.getInput()), GermGuiInput.EventType.LOSE_FOCUS)
+                    .registerCallbackHandler((p,b)->inputCategory(inputCategory.getInput()), GermGuiInput.EventType.ENTER));
+            addGuiPart(types);
+            addGuiPart(confirm);
+            addGuiPart(scrollTex);
+            addGuiPart(scroll);
+
+            int i = 0;
+            boolean v = false;
+            for(PresetLibrary.PresetList list : ps.ges.library.getList())
+            {
+                if(list.category.equals(category))v=true;
+
+                GermGuiButton main = UtilGerm2K.createButton(UUID.randomUUID().toString(),"aestus/he/edit/add_preset_type.png",0,i*23)
+                        .registerCallbackHandler((p,b)->{scrollTex.setEnable(false);scroll.setEnable(false);inputCategory.setInput(list.category);inputCategory(list.category);}, GermGuiButton.EventType.LEFT_CLICK);
+                GermGuiLabel label = UtilGerm2K.createLabel(UUID.randomUUID().toString(),list.category,84,i*23+4,1.75F, GermGuiLabel.Align.CENTER);
+                scroll.addGuiPart(main);
+                scroll.addGuiPart(label);
+                i++;
+            }
+            if(!v){
+                GermGuiButton main = UtilGerm2K.createButton(UUID.randomUUID().toString(),"aestus/he/edit/add_preset_type.png",0,i*23)
+                        .registerCallbackHandler((p,b)->{scrollTex.setEnable(false);scroll.setEnable(false);inputCategory(inputCategory.getInput());}, GermGuiButton.EventType.LEFT_CLICK);
+                GermGuiLabel label = UtilGerm2K.createLabel(UUID.randomUUID().toString(),"创建",84,i*23+4,1.75F, GermGuiLabel.Align.CENTER);
+                scroll.addGuiPart(main);
+                scroll.addGuiPart(label);
+            }
+
+
+        }
+        public void confirm()
+        {
+            if(id==null||name==null||category==null||"".equals(id)||"".equals(name)||"".equals(category))return;
+
+            PresetLibrary.PresetList list = ps.ges.library.getList(category);
+            if(list==null) list = ps.ges.library.createList(category);
+            if(list==null) return;
+
+            state.id=id;state.name=name;
+            list.add(state);
+
+            close();
+        }
+        public void inputID(String v)
+        {
+            this.id=v;
+        }
+
+        public void inputName(String v)
+        {
+            this.name=v;
+        }
+
+        public void inputCategory(String v)
+        {
+            this.category=v;
         }
 
     }

@@ -33,9 +33,6 @@ public final class GermHETools extends JavaPlugin {
         frame.setSize(1200,600);
         frame.setVisible(true);
 
-        for(Player p : Bukkit.getOnlinePlayers())
-            Event.joinHandle(p);
-
         GermKeyAPI.registerKey(KeyType.KEY_UP);
         GermKeyAPI.registerKey(KeyType.KEY_LEFT);
         GermKeyAPI.registerKey(KeyType.KEY_RIGHT);
@@ -43,12 +40,24 @@ public final class GermHETools extends JavaPlugin {
         GermKeyAPI.registerKey(KeyType.KEY_EQUALS);
         GermKeyAPI.registerKey(KeyType.KEY_RETURN);
         GermKeyAPI.sendRegisteredKeysToAllPlayer();
+
+        saveDefaultConfig();
+        Config.path=getConfig().getString("Path");
+        if(Config.path==null || "".equals(Config.path))
+            Config.path=getDataFolder().getAbsolutePath()+"/";
+
+        for(Player p : Bukkit.getOnlinePlayers())
+            Event.joinHandle(p);
     }
 
     @Override
     public void onDisable()
     {
-        Bukkit.getOnlinePlayers().forEach(PlayerState::remove);
+        for(PlayerState ps : PlayerState.values())
+            try {
+                ps.save();
+            }catch (Exception e){e.printStackTrace();}
+        PlayerState.players.clear();
     }
     public static GermHETools getInstance(){return instance;}
 }

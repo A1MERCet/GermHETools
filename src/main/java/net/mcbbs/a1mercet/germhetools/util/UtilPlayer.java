@@ -1,16 +1,34 @@
 package net.mcbbs.a1mercet.germhetools.util;
 
+import com.germ.germplugin.api.dynamic.gui.GermGuiScreen;
+import com.germ.germplugin.api.dynamic.gui.GuiManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class UtilPlayer
 {
+    public List<GermGuiScreen> getOpenedGuiAll(Player p)
+    {
+        List<GermGuiScreen> l = new ArrayList<>();
+
+        for(GermGuiScreen g : GuiManager.getOpenedAllGui(p))
+        {
+            l.add(g);
+            l.addAll(g.getChildGuiScreens());
+        }
+
+        return l;
+    }
+
     public static Block rayTraceBlock(LivingEntity e, double range) {return rayTraceBlock(e.getEyeLocation(),range);}
     public static Block rayTraceBlock(Location loc, double range)
     {

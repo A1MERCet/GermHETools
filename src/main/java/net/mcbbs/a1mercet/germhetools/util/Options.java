@@ -137,6 +137,15 @@ public class Options<K> extends HashMap<K, Options.IValue> implements Serializab
         @Override public Type getValueType(){return Type.LONG;}
     }
 
+    public Options()
+    {
+    }
+    public Options(Options<K> o)
+    {
+        for(K k : o.keySet())
+            putDefault(k,o.get(k).getValue());
+    }
+
     public static IValue create(Object o)
     {
         if(o instanceof String)         return Type.STRING  .create(o);

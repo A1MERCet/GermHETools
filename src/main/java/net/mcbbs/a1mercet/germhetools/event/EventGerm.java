@@ -1,16 +1,55 @@
 package net.mcbbs.a1mercet.germhetools.event;
 
+import com.germ.germplugin.api.dynamic.gui.GermGuiScreen;
+import com.germ.germplugin.api.dynamic.gui.GuiManager;
 import com.germ.germplugin.api.event.GermKeyDownEvent;
 import com.germ.germplugin.api.event.GermKeyUpEvent;
+import net.mcbbs.a1mercet.germhetools.api.event.AddPresetEvent;
+import net.mcbbs.a1mercet.germhetools.api.event.DeletePresetEvent;
+import net.mcbbs.a1mercet.germhetools.api.event.HEStateSaveEvent;
+import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
-import org.bukkit.Bukkit;
+import net.mcbbs.a1mercet.germhetools.player.ges.PresetLibrary;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.HashMap;
-
 public class EventGerm implements Listener
 {
+    @EventHandler
+    public void confirmState(HEStateSaveEvent evt)
+    {
+        PlayerState ps = evt.ps;
+        PresetLibrary.PresetList list = ps.ges.library.getFrom(evt.state.id);
+
+        if(list!=null)
+            for(GermGuiScreen g : GuiManager.getOpenedAllGui(ps.player))
+                if(g instanceof GPresetLibrary)
+                {
+                    ((GPresetLibrary) g).update(list.category,evt.state);
+                }
+    }
+
+    @EventHandler
+    public void addPreset(AddPresetEvent evt)
+    {
+        PlayerState ps = evt.ps;
+        for(GermGuiScreen g : GuiManager.getOpenedAllGui(ps.player))
+            if(g instanceof GPresetLibrary)
+            {
+                ((GPresetLibrary) g).add(evt.list.category,evt.state);
+            }
+    }
+    @EventHandler
+    public void removePreset(DeletePresetEvent evt)
+    {
+        PlayerState ps = evt.ps;
+        for(GermGuiScreen g : GuiManager.getOpenedAllGui(ps.player))
+            if(g instanceof GPresetLibrary)
+            {
+                ((GPresetLibrary) g).remove(evt.list.category,evt.state);
+            }
+    }
+
     @EventHandler
     public void onKeyHandle(GermKeyDownEvent evt)
     {

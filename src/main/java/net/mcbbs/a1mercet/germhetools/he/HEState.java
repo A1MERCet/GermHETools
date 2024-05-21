@@ -100,6 +100,8 @@ public class HEState implements IConfig
     }
     public HEState(HEState s)
     {
+        this.id=s.id;
+        this.name=s.name;
         setLocation(s.location);
         setTransform(s.transform.getX(),s.transform.getY(),s.transform.getZ());
         setScale(s.scale.getX(),s.scale.getY(),s.scale.getZ());
@@ -113,6 +115,7 @@ public class HEState implements IConfig
         this.model=s.model;
         this.texture=s.texture;
         this.material.addAll(s.material);
+        this.data=new Options<>(s.data);
     }
 
     public ItemStack createItemStack()

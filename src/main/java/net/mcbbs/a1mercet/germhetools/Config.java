@@ -8,4 +8,5 @@ public class Config
     }
     public static GUIType guiType = GUIType.GERM;
     public static int historySize = 50;
+    public static String path = null;
 }

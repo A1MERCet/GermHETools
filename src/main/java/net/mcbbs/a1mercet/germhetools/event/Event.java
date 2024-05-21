@@ -29,13 +29,11 @@ public class Event implements Listener
             if(p.isSneaking() && p.getInventory().getItemInMainHand().getType().name().equals("HUEIHUEAENGINE_CUSTOMBLOCK") &&(e.getAction()==Action.RIGHT_CLICK_AIR||e.getAction()==Action.RIGHT_CLICK_BLOCK)){
                 HEGuiManager.createHEStateGui(p,new HEState().parse(p.getInventory().getItemInMainHand()),true).openGuiTo(p);
                 e.setCancelled(true);
-            } else if(block!=null&&e.getAction()==Action.RIGHT_CLICK_BLOCK) {
+            } else if(block!=null&&block.getType().name().equals("HUEIHUEAENGINE_CUSTOMBLOCK")&&e.getAction()==Action.RIGHT_CLICK_BLOCK) {
                 IGui gui = HEGuiManager.createHEStateGui(p,new HEState().parse(block),false);
                 if(gui!=null){
                     gui.openGuiTo(p);
                     e.setCancelled(true);
-                }else {
-                    p.sendMessage("HEState不存在");
                 }
             }
         }
@@ -44,6 +42,9 @@ public class Event implements Listener
     public static void joinHandle(Player p)
     {
         PlayerState ps = PlayerState.create(p);
+        try {
+            ps.load();
+        }catch (Exception e){e.printStackTrace();ps.player.kickPlayer("数据错误");}
     }
 
     @EventHandler
@@ -55,6 +56,11 @@ public class Event implements Listener
     public void onQuit(PlayerQuitEvent evt)
     {
         Player p = evt.getPlayer();
-        PlayerState.remove(p);
+        PlayerState ps = PlayerState.get(p);
+        try {
+            if(ps!=null){
+                ps.save();
+            }
+        }catch (Exception e){e.printStackTrace();}finally {PlayerState.remove(p);}
     }
 }
