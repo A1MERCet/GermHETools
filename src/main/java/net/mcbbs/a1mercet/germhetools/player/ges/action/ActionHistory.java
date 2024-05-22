@@ -31,24 +31,24 @@ public class ActionHistory
         return this;
     }
 
-    public ActionHistory revoke()
+    public IGESAction revoke()
     {
-        if(history.size()==0)return this;
+        if(history.size()==0)return null;
 
         IGESAction action = history.get(history.size()-1);
         action.onRevoke(parent);
         recovery.add(action);
 
-        return this;
+        return action;
     }
 
-    public IGESAction recovery()
+    public IGESAction reRevoke()
     {
         if(recovery.size()==0)return null;
 
         IGESAction action = recovery.get(recovery.size()-1);
         action.onApply(parent);
-        history.add(action);
+        recovery.add(action);
 
         return action;
     }

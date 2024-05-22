@@ -29,10 +29,6 @@ public final class GermHETools extends JavaPlugin {
         BlockManager.init();
         Bukkit.getLogger().info("§6[HETools]已成功加载");
 
-        JFrame frame = new JFrame("TEST");
-        frame.setSize(1200,600);
-        frame.setVisible(true);
-
         GermKeyAPI.registerKey(KeyType.KEY_UP);
         GermKeyAPI.registerKey(KeyType.KEY_LEFT);
         GermKeyAPI.registerKey(KeyType.KEY_RIGHT);

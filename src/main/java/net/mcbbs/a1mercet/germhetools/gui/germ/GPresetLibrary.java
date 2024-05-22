@@ -1,10 +1,10 @@
 package net.mcbbs.a1mercet.germhetools.gui.germ;
 
 import com.germ.germplugin.api.dynamic.gui.*;
-import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetList;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
 
 import java.util.ArrayList;
@@ -12,6 +12,11 @@ import java.util.List;
 
 public class GPresetLibrary extends GermGuiBase
 {
+    public interface ICallbackSelect
+    {
+        void onSelect(PlayerState ps , GPreset preset);
+    }
+
     public static int PSIZE = 110;
     public static int PINTERVAL = 5;
     public static int PMAX_ROW = 3;
@@ -20,7 +25,7 @@ public class GPresetLibrary extends GermGuiBase
     public class GList extends GermGuiCanvas
     {
         public String color = "blue";
-        public final PresetLibrary.PresetList<IPreset<?>> list;
+        public final PresetList<IPreset<?>> list;
         public boolean isOpen = false;
 
         public final GermGuiTexture background  = UtilGerm2K.createTexture("background","",0,20,590,5);
@@ -29,9 +34,9 @@ public class GPresetLibrary extends GermGuiBase
                     if(isOpen)  clear();
                     else        reset();
                 }, GermGuiButton.EventType.LEFT_CLICK);
-        public final GermGuiButton delete       = UtilGerm2K.createButton("delete","aestus/he/library/delete.png",560,5).registerCallbackHandler((p,b)->delete(), GermGuiButton.EventType.LEFT_CLICK);
+        public final GermGuiButton delete       = UtilGerm2K.createButton("delete","he/library/delete.png",560,5).registerCallbackHandler((p,b)->delete(), GermGuiButton.EventType.LEFT_CLICK);
         public final GermGuiLabel name          = UtilGerm2K.createLabel("name","",550,8,2.5F, GermGuiLabel.Align.RIGHT);
-        public final GermGuiTexture searchTex   = UtilGerm2K.createTexture("search_tex","aestus/he/library/search.png",48,3);
+        public final GermGuiTexture searchTex   = UtilGerm2K.createTexture("search_tex","he/library/search.png",48,3);
         public final GermGuiInput search        = new GermGuiInput("search")
                 .setPermanentFocus(false).setPreview("...").setSync(true).setSwallow(true).setAutoClear(false)
                 .setBackground(false).setWidth("173/2560*w").setHeight("25/1440*h").setLocationX("60/2560*w").setLocationY("3/1440*h");
@@ -47,7 +52,7 @@ public class GPresetLibrary extends GermGuiBase
                 .setLocationVX("-15/2560*w").setWidthV("10/2560*w");
         public final List<GPreset> presets = new ArrayList<>();
 
-        public GList(PresetLibrary.PresetList<IPreset<?>> list , String color)
+        public GList(PresetList<IPreset<?>> list , String color)
         {
             super(list.category);
             this.list   = list;
@@ -84,7 +89,7 @@ public class GPresetLibrary extends GermGuiBase
                     presets.add(s);
 
             isOpen=true;
-            presets.forEach(e-> this.presets.add(e.createGPreset(ps,e,PSIZE)));
+            presets.forEach(e-> this.presets.add(createGPreset(e)));
             updateLayout();
         }
         public void reset()
@@ -93,7 +98,7 @@ public class GPresetLibrary extends GermGuiBase
 
             isOpen=true;
             for(IPreset<?> preset : list)
-                presets.add(preset.createGPreset(ps,preset,PSIZE));
+                presets.add(createGPreset(preset));
             updateLayout();
         }
         public void clear()
@@ -127,8 +132,8 @@ public class GPresetLibrary extends GermGuiBase
         }
         public void update()
         {
-            background.setPath("aestus/he/library/list_"+color+"_color.png");
-            title.setDefaultPath("aestus/he/library/list_"+color+(isOpen?"_open":"")+".png");
+            background.setPath("he/library/list_"+color+"_color.png");
+            title.setDefaultPath("he/library/list_"+color+(isOpen?"_open":"")+".png");
             name.setText("#FFAFAFAF"+list.category+"("+list.size()+")");
         }
         public void remove(IPreset<?> preset)
@@ -155,11 +160,18 @@ public class GPresetLibrary extends GermGuiBase
         public void add(IPreset<?> preset)
         {
             remove(preset);
-            GPreset g = preset.createGPreset(ps,preset,PSIZE);
+            GPreset g = createGPreset(preset);
             presets.add(g);
             updateLayout();
             name.setText("#FFAFAFAF"+list.category+"("+(list.size()+1)+")");
         }
+        public GPreset createGPreset(IPreset<?> p)
+        {
+            GPreset gpreset = p.createGPreset(ps,PSIZE);
+            gpreset.registerCallbackSelect((pr,g)->callbackSelect(gpreset));
+            return gpreset;
+        }
+
         public int getLayoutHeight()    {return presets.size()==0?0:Math.min(Math.max(1,presets.size()/PMAX_RANK)*(PSIZE+PINTERVAL),PMAX_ROW*(PSIZE+PINTERVAL))+20;}
         public int getListHeight()      {return 35+getLayoutHeight();}
     }
@@ -167,8 +179,8 @@ public class GPresetLibrary extends GermGuiBase
     public final PresetLibrary library;
     public final List<GList> lists = new ArrayList<>();
 
-    public final GermGuiTexture main        = UtilGerm2K.createTexture("main","aestus/he/library/main.png");
-    public final GermGuiButton close        = UtilGerm2K.createButton("close","aestus/he/library/close.png",562,2)
+    public final GermGuiTexture main        = UtilGerm2K.createTexture("main","he/library/main.png");
+    public final GermGuiButton close        = UtilGerm2K.createButton("close","he/library/close.png",562,2)
             .registerCallbackHandler((p,b)->close(), GermGuiButton.EventType.LEFT_CLICK);
 
     public final GermGuiScroll scroll = new GermGuiScroll("scroll")
@@ -198,6 +210,14 @@ public class GPresetLibrary extends GermGuiBase
         getOptions().setDrag(new GermGuiOptions.Drag().setWidth("660/2560*w").setHeight("40/1440*h").setLocationX("0").setLocationY("0"));
         getOptions().setDragSwallow(false);
         reset();
+    }
+    protected ICallbackSelect callbackSelect;
+    public GPresetLibrary registerCallbackSelect(ICallbackSelect i){callbackSelect=i;return this;}
+    public GPresetLibrary clearCallbackSelect(){callbackSelect=null;return this;}
+    public void callbackSelect(GPreset preset)
+    {
+        if(callbackSelect!=null)
+            callbackSelect.onSelect(ps,preset);
     }
     public void update()
     {

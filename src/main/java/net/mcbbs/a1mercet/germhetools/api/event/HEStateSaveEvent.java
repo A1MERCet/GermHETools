@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 public class HEStateSaveEvent extends PlayerEventBase
 {
     public final HEState state;
-    public HEStateSaveEvent(Player who,HEState state)
+    public HEStateSaveEvent(Player who, HEState state)
     {
         super(who);
         this.state=state;

@@ -1,6 +1,5 @@
 package net.mcbbs.a1mercet.germhetools.player.ges.action;
 
-import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
 import net.mcbbs.a1mercet.germhetools.util.Options;
 
@@ -22,7 +21,5 @@ public abstract class GESActionBase implements IGESAction
     @Override public String getID()                 {return id;}
     @Override public String getName()               {return name;}
     @Override public String getType()               {return type;}
-    @Override public HEState getHEState()           {return ges.current;}
-
     @Override public GES getGES() {return ges;}
 }

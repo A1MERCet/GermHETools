@@ -6,6 +6,7 @@ import net.mcbbs.a1mercet.germhetools.gui.germ.GActionPanel;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPreset;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetHEBlock;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
+import net.mcbbs.a1mercet.germhetools.player.ges.target.IGESBlock;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
 import net.mcbbs.a1mercet.germhetools.util.Options;
 import net.mcbbs.a1mercet.germhetools.util.UtilConfig;
@@ -23,7 +24,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HEState implements IPreset<HEState>
+public class HEState implements IPreset<HEState> , IGESBlock
 {
 
     @Override public String getDefaultPath() {return id;}
@@ -82,8 +83,8 @@ public class HEState implements IPreset<HEState>
         material.addAll(section.getStringList("Material"));
     }
 
-    public String id = "NaN";
-    public String name = "NaN";
+    public String id = "hestate";
+    public String name = "HEState";
     public String model = "";
     public String texture = "";
 
@@ -99,6 +100,7 @@ public class HEState implements IPreset<HEState>
     public boolean enableGlowTexture = false;
     public String glowTexture = "";
     public Options<String> data = new Options<>();
+    public Options<String> targetData = new Options<>();
 
     public final List<String> material = new ArrayList<>();
 
@@ -120,10 +122,11 @@ public class HEState implements IPreset<HEState>
         tag.set("tag",cutomsBlock);
         return UtilNBT.saveItemNBT(i,tag);
     }
-    public boolean place(){return place(null);}
+
+    @Override
     public boolean place(Location loc)
     {
-        if(loc!=null)setLocation(loc);
+        setLocation(loc);
 
         Block b = location.getBlock();
         if(!(BlockManager.material.name().equals(b.getType().name()))){
@@ -283,31 +286,31 @@ public class HEState implements IPreset<HEState>
     }
 
     public HEState setLocation(World w , double x , double y , double z){location.setWorld(w);location.setX(x);location.setY(y);location.setZ(z);return this;}
-    public HEState setLocation(Location l){location.setWorld(l.getWorld());location.setX(l.getX());location.setY(l.getY());location.setZ(l.getZ());return this;}
+    public void setLocation(Location l){location.setWorld(l.getWorld());location.setX(l.getX());location.setY(l.getY());location.setZ(l.getZ());}
     public HEState setSize(double size) {this.size = size;return this;}
-    public HEState setTransform(double x, double y,double z){transform.setX(x).setY(y).setZ(z);return this;}
-    public HEState setRotate(double x, double y,double z){rotate.setX(x).setY(y).setZ(z);return this;}
-    public HEState setScale(double x, double y,double z){scale.setX(x).setY(y).setZ(z);return this;}
+    public HEState setTransform(double x, double y, double z){transform.setX(x).setY(y).setZ(z);return this;}
+    public HEState setRotate(double x, double y, double z){rotate.setX(x).setY(y).setZ(z);return this;}
+    public HEState setScale(double x, double y, double z){scale.setX(x).setY(y).setZ(z);return this;}
     public HEState setEnableGlowTexture(boolean enableGlowTexture) {this.enableGlowTexture = enableGlowTexture;return this;}
     public HEState setPassable(boolean passable) {this.passable = passable;return this;}
     public HEState setGlowTexture(String glowTexture) {this.glowTexture = glowTexture;return this;}
     public HEState setModel(String model) {this.model = model;return this;}
     public HEState setTexture(String texture) {this.texture = texture;return this;}
-    public HEState setAABB(double minx,double miny,double minz,double maxx, double maxy,double maxz){aabbMin.setX(minx).setY(miny).setZ(minz);aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
-    public HEState setAABBMin(double minx,double miny,double minz){aabbMin.setX(minx).setY(miny).setZ(minz);return this;}
-    public HEState setAABBMax(double maxx, double maxy,double maxz){aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
+    public HEState setAABB(double minx, double miny, double minz, double maxx, double maxy, double maxz){aabbMin.setX(minx).setY(miny).setZ(minz);aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
+    public HEState setAABBMin(double minx, double miny, double minz){aabbMin.setX(minx).setY(miny).setZ(minz);return this;}
+    public HEState setAABBMax(double maxx, double maxy, double maxz){aabbMax.setX(maxx).setY(maxy).setZ(maxz);return this;}
     public HEState setId(String id) {this.id = id;return this;}
     public HEState setName(String name) {this.name = name;return this;}
 
-    @Override public GPreset createGPreset(PlayerState ps , IPreset<?> preset , int size) {GPreset g = new GPresetHEBlock(ps, (HEState) preset.getObject(),size);g.build();return g;}
+    @Override public GPreset createGPreset(PlayerState ps , int size) {GPreset g = new GPresetHEBlock(ps, this,size);g.build();return g;}
     @Override public String getType() {return "BLOCK";}
     @Override public String getID() {return id;}
     @Override public String getName() {return name;}
     @Override public long getAddDate() {return data.getLong("date");}
     @Override public HEState getObject() {return this;}
     @Override public Options<String> getData() {return data;}
-    @Override public void copy(IPreset<HEState> preset) {
-        HEState s = preset.getObject();
+    @Override public void copy(IPreset<?> preset) {
+        HEState s = (HEState) preset.getObject();
 
         this.id=s.id;
         this.name=s.name;
@@ -353,4 +356,17 @@ public class HEState implements IPreset<HEState>
 
         return g;
     }
+
+
+    @Override public Location getLocation()                     {return location;}
+    @Override public void remove()                              {if(location.getWorld()!=null)location.getBlock().setType(Material.AIR);}
+    @Override public void setOffset(Vector vector)              {transform.copy(vector);}
+    @Override public Vector getOffset()                         {return transform;}
+    @Override public void setRotate(Vector vector)              {rotate.copy(vector);}
+    @Override public Vector getRotate()                         {return rotate;}
+    @Override public void setScale(Vector vector)               {scale.copy(vector);}
+    @Override public Vector getScale()                          {return scale;}
+
+    @Override public Object getTarget() {return this;}
+    @Override public Options<String> getTargetData() {return targetData;}
 }

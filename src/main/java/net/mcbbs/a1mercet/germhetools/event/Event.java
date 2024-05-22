@@ -1,11 +1,10 @@
 package net.mcbbs.a1mercet.germhetools.event;
 
-import net.mcbbs.a1mercet.germhetools.api.BlockManager;
+import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.gui.IGui;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
-import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
-import org.bukkit.*;
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

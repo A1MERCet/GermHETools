@@ -1,11 +1,9 @@
 package net.mcbbs.a1mercet.germhetools.player.ges.action;
 
-import com.germ.germplugin.api.dynamic.effect.GermEffectPart;
-import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
 import net.mcbbs.a1mercet.germhetools.player.ges.builder.SampleBuilderVector;
+import net.mcbbs.a1mercet.germhetools.player.ges.target.IGESLocation;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
 public class GESActionRotate extends GESActionVector
@@ -16,56 +14,31 @@ public class GESActionRotate extends GESActionVector
     }
 
     @Override
-    public boolean onApply(GES ges)
+    public void onApplyTargetData()
     {
-        if(!super.onApply(ges))return false;
-        HEState state = getHEState();
-        Vector cal = calVector();
+        super.onApplyTargetData();
 
-        state.location.getBlock().setType(Material.AIR);
-        state.setRotate(cal.getX(),cal.getY(),cal.getZ());
-        state.place();
-        ges.setHEState(state.location.getBlock());
-        return true;
+        IGESLocation target = (IGESLocation)getTarget();
+        target.setRotate(calTargetVector());
+
+        target.updateLocation();
     }
 
-    @Override
-    public boolean onRevoke(GES ges)
-    {
-        if(!super.onRevoke(ges))return false;
-        HEState state = getHEState();
-        Vector cal = calVector();
-
-        state.setRotate(cal.getX(),cal.getY(),cal.getZ());
-        state.place();
-        ges.setHEState(state.location.getBlock());
-        return true;
-    }
+    @Override public Location getEffectLocation() {return ((IGESLocation)getTarget()).getLocation();}
 
     @Override
-    public Vector calVector()
+    public Vector calTargetVector()
     {
-        HEState state = getHEState();
-        if(state==null)return offset;
+        IGESLocation target = (IGESLocation)getTarget();
+        if(target==null)return value;
 
-        Vector rotate = state.rotate;
-        if(overwrite)   return new Vector(offset.getX(),offset.getY(),offset.getZ());
-        else            return new Vector(rotate.getX()+offset.getX(),rotate.getY()+offset.getY(),rotate.getZ()+offset.getZ());
-    }
-
-    @Override
-    public void onShowSample()
-    {
-        HEState state = getHEState();   if(state==null)return;
-        Location location = state.location;
-        GermEffectPart<?> e = createEffect();
-        Vector cal = calVector();
-
-        e.spawnToLocation(ges.ps.player, location.getX(),location.getY(),location.getZ());
-        data.putDefault("effect",e);
-        ges.ps.player.sendMessage("旋转["+cal.toString()+"]");
+        Vector rotate = target.getRotate();
+        if(overwrite)   return new Vector(value.getX(), value.getY(), value.getZ());
+        else            return new Vector(rotate.getX()+ value.getX(),rotate.getY()+ value.getY(),rotate.getZ()+ value.getZ());
     }
 
     @Override public IGESAction createInstance(GES ges) {return new GESActionRotate(ges);}
     @Override public SampleBuilderVector<? extends IGESAction> createBuilder() {return new SampleBuilderVector<GESActionRotate>(this);}
+    @Override public int[] getKey() {return new int[]{19,-1};}
+
 }

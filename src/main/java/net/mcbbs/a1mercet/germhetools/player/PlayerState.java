@@ -10,13 +10,21 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public class PlayerState implements IConfig
 {
+    public static final HashMap<Integer,Integer> assistKey = new HashMap<>();
+    static {
+        assistKey.put(42,42);
+        assistKey.put(54,54);
+        assistKey.put(29,29);
+        assistKey.put(157,157);
+        assistKey.put(56,56);
+        assistKey.put(184,184);
+    }
+
     public static HashMap<String,PlayerState> players = new HashMap<>();
     public static Collection<PlayerState> values()  {return players.values();}
     public static void remove(Player p)             {players.remove(p.getName());}
@@ -32,12 +40,10 @@ public class PlayerState implements IConfig
         return ps;
     }
 
-
-
     public final Player player;
     public final String name;
 
-    public final HashMap<Integer,Integer> keyMap    = new HashMap<>();
+    public final int[] keyPreseed                   = new int[]{-1,-1};
     public boolean allowGES                         = false;
     public GES ges                                  = null;
 
@@ -47,18 +53,25 @@ public class PlayerState implements IConfig
         this.name = player.getName();
     }
 
+    public void clearKey()
+    {
+        keyPreseed[0]=-1;
+        keyPreseed[1]=-1;
+    }
     public void removeKey(int k)
     {
-        keyMap.remove(k);
+        boolean assist = assistKey.containsKey(k);
+        if(assist)  clearKey();
+        else        keyPreseed[0]=-1;
     }
-    public void addKey(int k)
+    public void setKey(int k)
     {
-        keyMap.put(k,k);
         if(isGESEnable()){
-            if(hasKey(42))          ges.keyHandle(k,42);
-            else if(hasKey(29))     ges.keyHandle(k,29);
-            else if(hasKey(56))     ges.keyHandle(k,56);
-            else                       ges.keyHandle(k,-1);
+            boolean assist = assistKey.containsKey(k);
+            if(assist)  keyPreseed[1]=k;
+            else        keyPreseed[0]=k;
+
+            ges.keyHandle(keyPreseed[0],keyPreseed[1]);
         }
     }
 
@@ -77,22 +90,24 @@ public class PlayerState implements IConfig
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RETURN.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_BACK.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Z.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RMENU.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LMENU.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_CAPITAL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_GRAVE.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RCONTROL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LCONTROL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_X.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_F.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_D.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_N.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_R.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_C.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_G.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_MINUS.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DELETE.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_INSERT.getKeyId());
         }
-    }
-
-    /**
-     * <br>LSHIFT    = 42
-     * <br>LCTRL     = 29
-     * <br>LALT      = 56
-     * <br>SPACE     = 57
-     * <br>ENTER     = 28
-     * <br>ESC       = 1
-     * <br>TAB       = 15
-     * <br>~         = 41
-     */
-    public boolean hasKey(int k)
-    {
-        return keyMap.containsKey(k);
     }
 
     public boolean isGESEnable(){return ges!=null&&ges.enable;}

@@ -1,5 +1,6 @@
 package net.mcbbs.a1mercet.germhetools.event;
 
+import com.germ.germplugin.api.GermPacketAPI;
 import com.germ.germplugin.api.dynamic.gui.GermGuiScreen;
 import com.germ.germplugin.api.dynamic.gui.GuiManager;
 import com.germ.germplugin.api.event.GermKeyDownEvent;
@@ -10,7 +11,7 @@ import net.mcbbs.a1mercet.germhetools.api.event.HEStateSaveEvent;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
-import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetList;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -21,7 +22,7 @@ public class EventGerm implements Listener
     {
         PlayerState ps = evt.ps;
         if(ps.ges==null)return;
-        PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getFrom(evt.state.id);
+        PresetList<IPreset<?>> list = ps.ges.library.getFrom(evt.state.id);
 
         if(list!=null)
             for(GermGuiScreen g : GuiManager.getOpenedAllGui(ps.player))
@@ -55,9 +56,12 @@ public class EventGerm implements Listener
     @EventHandler
     public void onKeyHandle(GermKeyDownEvent evt)
     {
+        if(evt.getKeyType().getKeyId()==56)
+            GermPacketAPI.setPlayerFocus(evt.getPlayer(),false);
+
         for(PlayerState ps : PlayerState.values())
             if(ps.isGESEnable())
-                ps.addKey(evt.getKeyType().getKeyId());
+                ps.setKey(evt.getKeyType().getKeyId());
     }
     @EventHandler
     public void onKeyHandle(GermKeyUpEvent evt)

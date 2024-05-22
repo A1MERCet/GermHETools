@@ -8,18 +8,15 @@ import com.germ.germplugin.api.dynamic.gui.*;
 import net.mcbbs.a1mercet.germhetools.GermHETools;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.api.event.HEStateSaveEvent;
+import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.he.HEManager;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
-import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
-import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetList;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
-import net.minecraft.server.v1_12_R1.*;
+import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -47,9 +44,9 @@ public class GHEState extends GermGuiBase
             super("material_quickly_panel");
             this.parent=parent;
 
-            addGuiPart(UtilGerm2K.createTexture("quickly_panel","aestus/he/edit/material_quicklypanel.png",-4,-9));
-            addGuiPart(UtilGerm2K.createTexture("generate_panel","aestus/he/edit/material_generate_panel.png",-4,61));
-            addGuiPart(UtilGerm2K.createTexture("mtl_panel","aestus/he/edit/material_mtl_panel.png",-4,131));
+            addGuiPart(UtilGerm2K.createTexture("quickly_panel","he/edit/material_quicklypanel.png",-4,-9));
+            addGuiPart(UtilGerm2K.createTexture("generate_panel","he/edit/material_generate_panel.png",-4,61));
+            addGuiPart(UtilGerm2K.createTexture("mtl_panel","he/edit/material_mtl_panel.png",-4,131));
             addGuiPart(inputName
                     .setPreview("材质名/纹理名")
                     .registerCallbackHandler((p,i)->add(), GermGuiInput.EventType.ENTER));
@@ -66,11 +63,11 @@ public class GHEState extends GermGuiBase
             addGuiPart(inputMTLPath
                     .setPreview("纹理路径"));
 
-            addGuiPart(UtilGerm2K.createButton("add_material","aestus/he/edit/material_quicklypanel_add.png",560,6)
+            addGuiPart(UtilGerm2K.createButton("add_material","he/edit/material_quicklypanel_add.png",560,6)
                     .registerCallbackHandler((p,b)->add(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("generate_material","aestus/he/edit/material_quicklypanel_add.png",560,76)
+            addGuiPart(UtilGerm2K.createButton("generate_material","he/edit/material_quicklypanel_add.png",560,76)
                     .registerCallbackHandler((p,b)->generate(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("generate_mtl","aestus/he/edit/material_quicklypanel_add.png",560,146)
+            addGuiPart(UtilGerm2K.createButton("generate_mtl","he/edit/material_quicklypanel_add.png",560,146)
                     .registerCallbackHandler((p,b)->generateMTL(), GermGuiButton.EventType.LEFT_CLICK));
         }
         public GMaterialBar add(){return add(inputName.getInput(),inputPath.getInput());}
@@ -121,12 +118,12 @@ public class GHEState extends GermGuiBase
         public GMaterials()
         {
             super("materials");
-            addGuiPart(UtilGerm2K.createTexture("tmaterials","aestus/he/edit/materials.png"));
-            addGuiPart(UtilGerm2K.createButton("clear","aestus/he/edit/clear.png",165,10,40,40)
+            addGuiPart(UtilGerm2K.createTexture("tmaterials","he/edit/materials.png"));
+            addGuiPart(UtilGerm2K.createButton("clear","he/edit/clear.png",165,10,40,40)
                     .registerCallbackHandler((p,b)->this.clear(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("add","aestus/he/edit/material_add.png",530,10)
+            addGuiPart(UtilGerm2K.createButton("add","he/edit/material_add.png",530,10)
                     .registerCallbackHandler((p,b)->this.addMaterialBar(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("add_quickly","aestus/he/edit/material_addquickly.png",385,10)
+            addGuiPart(UtilGerm2K.createButton("add_quickly","he/edit/material_addquickly.png",385,10)
                     .registerCallbackHandler((p,b)->{
                         if(GHEState.this.getGuiPart("material_quickly_panel")!=null)
                             GHEState.this.removeGuiPart("material_quickly_panel");
@@ -203,14 +200,14 @@ public class GHEState extends GermGuiBase
         public final GMaterials parent;
         public final GInput inputName = new GInput("input_name").setLocation(31,3).setSize(266,24);
         public final GInput inputPath = new GInput("input_path").setLocation(2,32).setSize(556,26);
-        public final GermGuiButton remove = UtilGerm2K.createButton("remove","aestus/he/edit/material_remove.png",303,3)
+        public final GermGuiButton remove = UtilGerm2K.createButton("remove","he/edit/material_remove.png",303,3)
                 .registerCallbackHandler((p,b)->this.remove(), GermGuiButton.EventType.LEFT_CLICK);
 
         public GMaterialBar(GMaterials parent)
         {
             super("material_"+ UUID.randomUUID());
             this.parent=parent;
-            addGuiPart(UtilGerm2K.createTexture("main","aestus/he/edit/material_bar.png"));
+            addGuiPart(UtilGerm2K.createTexture("main","he/edit/material_bar.png"));
             addGuiPart(inputName.setInput("材质名"));
             addGuiPart(inputPath.setInput("纹理路径"));
             addGuiPart(remove);
@@ -273,15 +270,15 @@ public class GHEState extends GermGuiBase
 
     protected final Player iplayer;
     protected final HEState state;
-    protected final GermGuiSlot slot = new GermGuiSlot("slot").setEmptyPath("aestus/he/edit/air.png").setFillPath("aestus/he/edit/air.png");
+    protected final GermGuiSlot slot = new GermGuiSlot("slot").setEmptyPath("he/edit/air.png").setFillPath("he/edit/air.png");
     protected final GermGuiLabel name = UtilGerm2K.createLabel("name","",690,28,2.5F);
     protected final GermGuiLabel name_space = UtilGerm2K.createLabel("name_space","",690,10,1.5F);
-    protected final GermGuiButton save = UtilGerm2K.createButton("save","aestus/he/edit/save.png",45,1330).setEnable(false).registerCallbackHandler((p,b)->{callbackSave();}, GermGuiButton.EventType.LEFT_CLICK);
+    protected final GermGuiButton save = UtilGerm2K.createButton("save","he/edit/save.png",45,1330).setEnable(false).registerCallbackHandler((p,b)->{callbackSave();}, GermGuiButton.EventType.LEFT_CLICK);
     protected final GMaterials materials = new GMaterials();
     protected boolean hand;
     protected GInput focus;
 
-    public GHEState(Player iplayer,HEState state,boolean hand)
+    public GHEState(Player iplayer, HEState state, boolean hand)
     {
         super("hestate");
         this.hand=hand;
@@ -331,9 +328,9 @@ public class GHEState extends GermGuiBase
 
         GermAnimationFade fade1 = new GermAnimationFade("fade").setFrom(0).setTo(1).setCycle(1).setDuration(300);
 
-        addGuiPart(UtilGerm2K.createTexture("main","aestus/he/edit/main.png"));
-        addGuiPart(UtilGerm2K.createTexture("title","aestus/he/edit/title.png",10,10));
-        addGuiPart(UtilGerm2K.createTexture("toptions","aestus/he/edit/options.png",10,100));
+        addGuiPart(UtilGerm2K.createTexture("main","he/edit/main.png"));
+        addGuiPart(UtilGerm2K.createTexture("title","he/edit/title.png",10,10));
+        addGuiPart(UtilGerm2K.createTexture("toptions","he/edit/options.png",10,100));
         addGuiPart(UtilGerm2K.setLocation(materials,10,730));
 
         for(int i = 0;i<state.material.size();i++)
@@ -342,7 +339,7 @@ public class GHEState extends GermGuiBase
             Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->materials.addMaterialBar(state.material.get(finalI)),i/10);
         }
 
-        addGuiPart(UtilGerm2K.createTexture("showcase","aestus/he/edit/showcase.png",610,10));
+        addGuiPart(UtilGerm2K.createTexture("showcase","he/edit/showcase.png",610,10));
         addGuiPart(name);
         addGuiPart(name_space);
 
@@ -391,20 +388,20 @@ public class GHEState extends GermGuiBase
                 }
             }.setLocation(454,352).setSize(556,26)
                     .setInput(state.followStyle));
-            addGuiPart(UtilGerm2K.createButton("follow_style_child","aestus/he/edit/child.png",559,354).registerCallbackHandler((p,b)->{
+            addGuiPart(UtilGerm2K.createButton("follow_style_child","he/edit/child.png",559,354).registerCallbackHandler((p,b)->{
                 GermGuiCanvas c = new GermGuiCanvas("c");
                 addGuiPart(c);
                 UtilGerm2K.setLocation(c,454,378);
-                c.addGuiPart(UtilGerm2K.createButton("close","aestus/he/edit/air.png",-50000,-50000,50000,50000).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("close","he/edit/air.png",-50000,-50000,50000,50000).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                 }, GermGuiButton.EventType.LEFT_CLICK));
 
                 int index = 0;
 
-                GermGuiTexture list = UtilGerm2K.createTexture("list","aestus/he/edit/child_list",0,0);
+                GermGuiTexture list = UtilGerm2K.createTexture("list","he/edit/child_list",0,0);
 
                 c.addGuiPart(list);
-                c.addGuiPart(UtilGerm2K.createButton("button_static","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_static","he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="static";
                     ((GInput)getGuiPart("follow_style")).setInput("static");
@@ -412,7 +409,7 @@ public class GHEState extends GermGuiBase
                 c.addGuiPart(UtilGerm2K.createLabel("label_static","static",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
-                c.addGuiPart(UtilGerm2K.createButton("button_4","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_4","he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="4f";
                     ((GInput)getGuiPart("follow_style")).setInput("4f");
@@ -420,7 +417,7 @@ public class GHEState extends GermGuiBase
                 c.addGuiPart(UtilGerm2K.createLabel("label_4","4f",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
-                c.addGuiPart(UtilGerm2K.createButton("button_8","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_8","he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="8f";
                     ((GInput)getGuiPart("follow_style")).setInput("8f");
@@ -428,7 +425,7 @@ public class GHEState extends GermGuiBase
                 c.addGuiPart(UtilGerm2K.createLabel("label_8","8f",64,4+index*28,1.5F, GermGuiLabel.Align.CENTER));
                 index++;
 
-                c.addGuiPart(UtilGerm2K.createButton("button_16","aestus/he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
+                c.addGuiPart(UtilGerm2K.createButton("button_16","he/edit/child_button.png",4,2+index*28,120,26).registerCallbackHandler((p2,b2)->{
                     GHEState.this.removeGuiPart(c);
                     state.followStyle="16f";
                     ((GInput)getGuiPart("follow_style")).setInput("16f");
@@ -439,9 +436,9 @@ public class GHEState extends GermGuiBase
                 UtilGerm2K.setSize(list,128,4+index*28);
             }, GermGuiButton.EventType.LEFT_CLICK));
 
-            addGuiPart(UtilGerm2K.createButton("passable",state.passable?"aestus/he/edit/true.png":"aestus/he/edit/false.png",275,392,16,16).registerCallbackHandler((p,b)->{
+            addGuiPart(UtilGerm2K.createButton("passable",state.passable?"he/edit/true.png":"he/edit/false.png",275,392,16,16).registerCallbackHandler((p,b)->{
                 state.passable=!state.passable;
-                b.setDefaultPath(state.passable?"aestus/he/edit/true.png":"aestus/he/edit/false.png");
+                b.setDefaultPath(state.passable?"he/edit/true.png":"he/edit/false.png");
             }, GermGuiButton.EventType.LEFT_CLICK));
         }
 
@@ -563,21 +560,22 @@ public class GHEState extends GermGuiBase
 
         //clear
         {
-            addGuiPart(UtilGerm2K.createButton("reset","aestus/he/edit/clear.png",520,20,60,60)
+            addGuiPart(UtilGerm2K.createButton("reset","he/edit/clear.png",520,20,60,60)
                     .registerCallbackHandler((p,b)->{
 
-                        HEState s = new HEState().setLocation(state.location);
+                        HEState s = new HEState();
+                        s.setLocation(state.location);
                         HEGuiManager.createHEStateGui(p,s,hand).openGuiTo(p);
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("remove_glow","aestus/he/edit/remove.png",552,317,26,26)
+            addGuiPart(UtilGerm2K.createButton("remove_glow","he/edit/remove.png",552,317,26,26)
                     .registerCallbackHandler((p,b)->{
 
                         ((GInput)getGuiPart("glow_path")).setInput("");
                         state.glowTexture="";
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("clear_base","aestus/he/edit/clear.png",175,110,40,40)
+            addGuiPart(UtilGerm2K.createButton("clear_base","he/edit/clear.png",175,110,40,40)
                     .registerCallbackHandler((p,b)->{
 
                         state.model="";
@@ -590,10 +588,10 @@ public class GHEState extends GermGuiBase
                         ((GInput)getGuiPart("texture_path")).setInput("");
                         ((GInput)getGuiPart("glow_path")).setInput("");
                         ((GInput)getGuiPart("follow_style")).setInput("static");
-                        b.setDefaultPath(state.passable?"aestus/he/edit/true.png":"aestus/he/edit/false.png");
+                        b.setDefaultPath(state.passable?"he/edit/true.png":"he/edit/false.png");
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("clear_bb","aestus/he/edit/clear.png",175,450,40,40)
+            addGuiPart(UtilGerm2K.createButton("clear_bb","he/edit/clear.png",175,450,40,40)
                     .registerCallbackHandler((p,b)->{
 
                         state.aabbMax.setX(1).setY(1).setZ(1);
@@ -607,7 +605,7 @@ public class GHEState extends GermGuiBase
                         ((GInput)getGuiPart("bb_maxz")).setInput("1.0");
 
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("clear_offset","aestus/he/edit/clear.png",175,560,40,40)
+            addGuiPart(UtilGerm2K.createButton("clear_offset","he/edit/clear.png",175,560,40,40)
                     .registerCallbackHandler((p,b)->{
 
                         state.transform.setX(0).setY(0).setZ(0);
@@ -632,12 +630,12 @@ public class GHEState extends GermGuiBase
         //options
         {
 
-            addGuiPart(UtilGerm2K.createButton("createitem","aestus/he/edit/createitem.png",850,535)
+            addGuiPart(UtilGerm2K.createButton("createitem","he/edit/createitem.png",850,535)
                     .registerCallbackHandler((p,b)->{
                         iplayer.getInventory().addItem(state.createItemStack());
                         iplayer.sendMessage("已添加至物品栏");
                     }, GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButton("savepreset","aestus/he/edit/savepreset.png",685,535)
+            addGuiPart(UtilGerm2K.createButton("savepreset","he/edit/savepreset.png",685,535)
                     .registerCallbackHandler((p,b)->{
                         callbackSavePreset();
                     }, GermGuiButton.EventType.LEFT_CLICK));
@@ -672,14 +670,9 @@ public class GHEState extends GermGuiBase
             iplayer.getInventory().setItemInMainHand(state.createItemStack());
             iplayer.getInventory().getItemInMainHand().setAmount(a);
         }else if(state.location.getWorld()!=null) {
-            Chunk chunk = state.location.getChunk();
             boolean r = state.place();
 
-            PacketPlayOutUnloadChunk packet1 = new PacketPlayOutUnloadChunk(chunk.getX(),chunk.getZ());
-            ((CraftPlayer)iplayer).getHandle().playerConnection.sendPacket(packet1);
-
-            PacketPlayOutMapChunk packet2 = new PacketPlayOutMapChunk(((CraftChunk)chunk).getHandle(),65535);
-            ((CraftPlayer)iplayer).getHandle().playerConnection.sendPacket(packet2);
+            UtilPlayer.updateBlockData(iplayer,state.location.getBlock());
 
             iplayer.sendMessage(r?"已保存":"保存失败");
         }
@@ -700,7 +693,7 @@ public class GHEState extends GermGuiBase
         public final HEState state;
         public String id,name,category;
 
-        public final GermGuiButton scrollTex = UtilGerm2K.createButtonBG("bg","aestus/he/edit/add_preset_list.png",371,55).setEnable(false);
+        public final GermGuiButton scrollTex = UtilGerm2K.createButtonBG("bg","he/edit/add_preset_list.png",371,55).setEnable(false);
         public final GermGuiScroll scroll = new GermGuiScroll("scroll")
                 .setWidth("168/2560*w").setHeight("191/1440*h")
                 .setLocationX("377/2560*w").setLocationY("60/1440*h")
@@ -721,12 +714,12 @@ public class GHEState extends GermGuiBase
         public final GermGuiInput inputCategory     = new GermGuiInput("input_Category")
                 .setPermanentFocus(false).setPreview("收藏夹").setSync(true).setSwallow(true).setAutoClear(false)
                 .setBackground(false).setWidth("178/2560*w").setHeight("40/1440*h").setLocationX("362/2560*w").setLocationY("15/1440*h");
-        public final GermGuiButton types            = UtilGerm2K.createButton("types","aestus/he/edit/add_preset_types.png",532,8)
+        public final GermGuiButton types            = UtilGerm2K.createButton("types","he/edit/add_preset_types.png",532,8)
                 .registerCallbackHandler((p,b)->{
                     scroll.setEnable(!scroll.isEnable());
                     scrollTex.setEnable(!scrollTex.isEnable());
                 }, GermGuiButton.EventType.LEFT_CLICK);
-        public final GermGuiButton confirm          = UtilGerm2K.createButton("confirm","aestus/he/edit/material_quicklypanel_add.png",560,6)
+        public final GermGuiButton confirm          = UtilGerm2K.createButton("confirm","he/edit/material_quicklypanel_add.png",560,6)
                 .registerCallbackHandler((p,b)->confirm(), GermGuiButton.EventType.LEFT_CLICK);
 
         public GAddPreset(PlayerState ps , HEState state)
@@ -736,15 +729,15 @@ public class GHEState extends GermGuiBase
             this.state=state;
             init();
 
-            PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getList("默认目录");
+            PresetList<IPreset<?>> list = ps.ges.library.getList("默认目录");
             if(list!=null)inputCategory.setInput(list.category);
         }
         protected void init()
         {
             getOptions().setStartX("1280/2560*w").setStartY("690/1440*h");
-            addGuiPart(UtilGerm2K.createButton("close","aestus/he/air.png",-5000,-5000,10000,10000)
+            addGuiPart(UtilGerm2K.createButton("close","he/air.png",-5000,-5000,10000,10000)
                     .registerCallbackHandler((p,b)->close(), GermGuiButton.EventType.LEFT_CLICK));
-            addGuiPart(UtilGerm2K.createButtonBG("mainbg","aestus/he/edit/addpreset.png",-4,-9));
+            addGuiPart(UtilGerm2K.createButtonBG("mainbg","he/edit/addpreset.png",-4,-9));
             addGuiPart(inputID
                     .registerCallbackHandler((p,b)->inputID(inputID.getInput()), GermGuiInput.EventType.INPUT)
                     .registerCallbackHandler((p,b)->inputID(inputID.getInput()), GermGuiInput.EventType.LOSE_FOCUS)
@@ -764,11 +757,11 @@ public class GHEState extends GermGuiBase
 
             int i = 0;
             boolean v = false;
-            for(PresetLibrary.PresetList<IPreset<?>> list : ps.ges.library.getList())
+            for(PresetList<IPreset<?>> list : ps.ges.library.getList())
             {
                 if(list.category.equals(category))v=true;
 
-                GermGuiButton main = UtilGerm2K.createButton(UUID.randomUUID().toString(),"aestus/he/edit/add_preset_type.png",0,i*23)
+                GermGuiButton main = UtilGerm2K.createButton(UUID.randomUUID().toString(),"he/edit/add_preset_type.png",0,i*23)
                         .registerCallbackHandler((p,b)->{scrollTex.setEnable(false);scroll.setEnable(false);inputCategory.setInput(list.category);inputCategory(list.category);}, GermGuiButton.EventType.LEFT_CLICK);
                 GermGuiLabel label = UtilGerm2K.createLabel(UUID.randomUUID().toString(),list.category,84,i*23+4,1.75F, GermGuiLabel.Align.CENTER);
                 scroll.addGuiPart(main);
@@ -776,7 +769,7 @@ public class GHEState extends GermGuiBase
                 i++;
             }
             if(!v){
-                GermGuiButton main = UtilGerm2K.createButton(UUID.randomUUID().toString(),"aestus/he/edit/add_preset_type.png",0,i*23)
+                GermGuiButton main = UtilGerm2K.createButton(UUID.randomUUID().toString(),"he/edit/add_preset_type.png",0,i*23)
                         .registerCallbackHandler((p,b)->{scrollTex.setEnable(false);scroll.setEnable(false);inputCategory(inputCategory.getInput());}, GermGuiButton.EventType.LEFT_CLICK);
                 GermGuiLabel label = UtilGerm2K.createLabel(UUID.randomUUID().toString(),"创建",84,i*23+4,1.75F, GermGuiLabel.Align.CENTER);
                 scroll.addGuiPart(main);
@@ -789,7 +782,7 @@ public class GHEState extends GermGuiBase
         {
             if(id==null||name==null||category==null||"".equals(id)||"".equals(name)||"".equals(category))return;
 
-            PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getList(category);
+            PresetList<IPreset<?>> list = ps.ges.library.getList(category);
             if(list==null) list = ps.ges.library.createList(category);
             if(list==null) return;
 

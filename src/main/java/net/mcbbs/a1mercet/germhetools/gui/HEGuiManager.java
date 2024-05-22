@@ -1,7 +1,7 @@
 package net.mcbbs.a1mercet.germhetools.gui;
 
-import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GHEState;
+import net.mcbbs.a1mercet.germhetools.he.HEState;
 import org.bukkit.entity.Player;
 
 public class HEGuiManager

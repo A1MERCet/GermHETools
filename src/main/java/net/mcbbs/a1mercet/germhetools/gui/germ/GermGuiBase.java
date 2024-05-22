@@ -5,7 +5,7 @@ import com.germ.germplugin.api.dynamic.gui.GuiManager;
 import net.mcbbs.a1mercet.germhetools.gui.IGui;
 import org.bukkit.entity.Player;
 
-public class GermGuiBase extends GermGuiScreen implements IGui
+public abstract class GermGuiBase extends GermGuiScreen implements IGui
 {
     public GermGuiBase(String guiName)
     {
@@ -19,13 +19,7 @@ public class GermGuiBase extends GermGuiScreen implements IGui
                 return;
         openGui(p);
     }
-    @Override public void openChildGuiTo(Player p) {openChildGui(p);}
-    @Override public void openHUDTo(Player p) {openHud(p);}
-    @Override
-    public void closeFrom(Player p) {
-        close();
-        for(GermGuiScreen g : GuiManager.getOpenedAllGui(p))
-            if(g.equals(this))
-                g.close();
-    }
+    @Override public void openChildGuiTo(Player p)  {openChildGui(p);}
+    @Override public void openHUDTo(Player p)       {openHud(p);}
+    @Override public void closeFrom(Player p)       {close();}
 }

@@ -1,6 +1,5 @@
 package net.mcbbs.a1mercet.germhetools.command;
 
-import io.netty.buffer.Unpooled;
 import net.mcbbs.a1mercet.germhetools.GermHETools;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
@@ -8,8 +7,10 @@ import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
-import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
-import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.EnumHand;
+import net.minecraft.server.v1_12_R1.PacketPlayInBlockPlace;
+import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -78,7 +79,7 @@ public class CMDServer extends CMDBase
         int i = 0;
         for(String str : GESActionType.types.keySet())
         {
-            IGESAction a = GESActionType.types.get(str);
+            net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction a = GESActionType.types.get(str);
             sender.sendMessage("["+i+"] "+a.getType()+"(类型)"+" - "+a.getName()+"["+a.getID()+"]");
             i++;
         }
@@ -112,7 +113,7 @@ public class CMDServer extends CMDBase
         Player p = (Player)sender;
         PlayerState ps = PlayerState.get(p);
         if(!gesCheck(ps))return;
-        ps.ges.removeHEState();
+        ps.ges.removeTarget();
     }
 
     @CommandArgs(
@@ -127,7 +128,7 @@ public class CMDServer extends CMDBase
         PlayerState ps = PlayerState.get(p);
         if(!gesCheck(ps))return;
 
-        if(!ps.ges.setHEStatePointer())
+        if(!ps.ges.setTargetPointer())
             sender.sendMessage("HEState不存在");
     }
 

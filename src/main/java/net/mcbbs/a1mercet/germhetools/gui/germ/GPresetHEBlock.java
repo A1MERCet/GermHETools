@@ -13,7 +13,7 @@ public class GPresetHEBlock extends GPreset
             .setWidth("70/2560*w").setHeight("70/1440*h")
             .setLocationX("20/2560*w").setLocationY("20/1440*h")
             .setSwallow(false).setIdentity(UUID.randomUUID().toString())
-            .setFillPath("aestus/he/air.png").setEmptyPath("aestus/he/air.png")
+            .setFillPath("he/air.png").setEmptyPath("he/air.png")
             ;
 
     public final HEState state;

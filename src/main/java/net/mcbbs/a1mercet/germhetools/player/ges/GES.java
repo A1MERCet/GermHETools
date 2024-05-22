@@ -1,6 +1,12 @@
 package net.mcbbs.a1mercet.germhetools.player.ges;
 
+import com.germ.germplugin.api.GermPacketAPI;
+import com.germ.germplugin.api.util.EntityUtil;
+import com.germ.germplugin.api.util.PlayerUtil;
+import com.germ.germplugin.api.util.RayTrackResult;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
+import net.mcbbs.a1mercet.germhetools.gui.germ.ges.GGES;
+import net.mcbbs.a1mercet.germhetools.gui.germ.ges.GMSGInfo;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.ActionHistory;
@@ -8,24 +14,25 @@ import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
 import net.mcbbs.a1mercet.germhetools.player.ges.builder.SampleBuilder;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
+import net.mcbbs.a1mercet.germhetools.player.ges.target.IGESTarget;
 import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 public class GES
 {
+    public GGES gui;
     public boolean enable = false;
     public final PlayerState ps;
     public final ActionHistory history = new ActionHistory(this);
     public final PresetLibrary library;
 
     protected SampleBuilder<? extends IGESAction> builder = null;
-    public HEState current = null;
+    public IGESTarget target = null;
 
     public GES(PlayerState ps)
     {
         this.ps             = ps;
-        this.enable         = true;
         this.library        = new PresetLibrary(ps);
     }
 
@@ -33,87 +40,108 @@ public class GES
     {
         IGESAction action = GESActionType.create(type,this);
         if(action!=null)return setBuilder(action);
-        else ps.player.sendMessage("编辑器类型 ["+type+"] 不存在");
+        else warn("编辑器类型 ["+type+"] 不存在");
+
         return false;
     }
-    public boolean setBuilder(IGESAction action)
+    public boolean setBuilder(IGESAction action){return setBuilder(action,false);}
+    public boolean setBuilder(IGESAction action , boolean tip)
     {
         removeBuilder();
 
         builder=action.createBuilder();
-        builder.onStateReSelect();
-        ps.player.sendMessage("已切换至编辑器 "+action.getName());
+        builder.onActive();
+        if(builder!=null)
+        {
+            builder.onTargetReSelect();
+            if(gui!=null)gui.onSetBuilder();
+            if(tip)msg("已切换至编辑器 ["+action.getName()+"]");
+        }
+
         return true;
     }
     public void removeBuilder()
     {
         if(builder!=null){
-            clearBuilder();
             builder=null;
+            if(gui!=null)gui.onRemoveBuilder();
         }
     }
     public void clearBuilder()
     {
         if(builder!=null)
+        {
             builder.clear();
+            if(gui!=null)gui.onClearBuilder();
+        }
     }
     public void keyHandle(int key , int assist)
     {
-        if(builder == null) return;
 
-        if(key==28){
-            builder.apply();
-            builder.onStateReSelect();
-            ps.player.sendMessage("已重置 ["+builder.sample.getName()+"] 操作状态");
-        }else if(key==14){
-            builder.clear();
-        }else if(key==44){
-            IGESAction action = history.recovery();
-            if(action!=null)ps.player.sendMessage("已撤销操作 ["+action.getName()+"]");
-            return;
+        if(builder!=null)
+        {
+            if(key==28){
+                builder.apply();
+                builder.onTargetReSelect();
+            }else if(key==14){
+                builder.clear();
+            }else if(key==44){
+                IGESAction action = history.revoke();
+                if(action!=null)msg("已撤销操作 ["+action.getName()+"]");
+                return;
+            }
+
+            builder.keyHandle(key , assist);
         }
 
-        builder.keyHandle(key , assist);
+        if(gui!=null) gui.onKeyHandle(key,assist);
     }
 
-    public void removeHEState()
+    public void setTarget(IGESTarget target){setTarget(target,false);}
+    public void setTarget(IGESTarget target , boolean tip)
     {
-        ps.player.sendMessage("已取消目标HEState");
-        current=null;
-    }
-
-    public void setHEState(HEState state)
-    {
-        if(current != null)     ps.player.sendMessage("已重设目标HEState");
-        else                    ps.player.sendMessage("已设置目标HEState");
         clearBuilder();
-        current=state;
-        if(builder!=null) builder.sample.onStateReSelect();
+        this.target=target;
+        if(tip)msg("已设置目标 "+target.getType()+"["+target.getName()+"]");
+        if(builder!=null) builder.action.onTargetReSelect();
+    }
+    public void removeTarget(){removeTarget(false);}
+    public void removeTarget(boolean tip)
+    {
+        if(this.target!=null)
+        {
+            if(tip)msg("已清除目标 "+target.getName());
+            removeBuilder();
+            this.target=null;
+        }
     }
 
-    public boolean setHEState(Block block)
+    public boolean setTargetBlock(Block block){return setTargetBlock(block,false);}
+    public boolean setTargetBlock(Block block,boolean tip)
     {
-        if(block!=null)
+        if(block!=null&&BlockManager.material.name().equals(block.getType().name()))
         {
             HEState pointer = new HEState().parse(block);
-            if(pointer==null)return false;
-            setHEState(pointer);
+            if(pointer==null){warn("不受支持的方块类型["+block.getType().name()+"]");return false;}
+            setTarget(pointer,tip);
             return true;
         }
         return false;
     }
-
-    public boolean setHEStatePointer()
+    public boolean setTargetPointer(){return setTargetPointer(false);}
+    public boolean setTargetPointer(boolean tip)
     {
         Location location = ps.player.getLocation();
-        Block block = UtilPlayer.rayTraceBlock(location.add(0D,ps.player.getEyeHeight(),0D),100D);
-        if(block!=null&&BlockManager.material.name().equals(block.getType().name()))
-        {
-            HEState pointer = new HEState().parse(block);
-            if(pointer==null)return false;
-            setHEState(pointer);
-            return true;
+        RayTrackResult ray = EntityUtil.getRayTrace(ps.player,100D,0D);
+        if(ray!=null && ray.getEntityHit()!=null){
+
+            //todo
         }
+
+        Block block = UtilPlayer.rayTraceBlock(location.add(0D,ps.player.getEyeHeight(),0D),100D);
+        if(block!=null)
+            return setTargetBlock(block,tip);
+
         return false;
     }
 
@@ -121,7 +149,35 @@ public class GES
     public GES setEnable(boolean enable)
     {
         this.enable = enable;
-        if(!enable) removeBuilder();
+        if(!enable) {
+            if(this.gui!=null){this.gui.closeFrom(ps.player);this.gui=null;}
+            removeBuilder();
+        }else {
+            this.gui = new GGES(this);
+            this.gui.build();
+            this.gui.openHUDTo(ps.player);
+        }
         return this;
     }
+
+    public void msg(GMSGInfo v){
+        if(gui!=null){
+            gui.msgContainer.sendMessage(v);
+        }else {
+            ps.player.sendMessage("["+v.type.name()+"]"+v.message);
+        }
+    }
+    public void msg(String v){msg(GMSGInfo.Type.INFO,v);}
+    public void warn(String v){msg(GMSGInfo.Type.WARN,v);}
+    public void error(String v){msg(GMSGInfo.Type.ERROR,v);}
+    public void msg(GMSGInfo.Type type , String v)
+    {
+        if(gui!=null){
+            gui.msgContainer.sendMessage(new GMSGInfo(type,v));
+        }else {
+            ps.player.sendMessage("["+type.name()+"]"+v);
+        }
+    }
+
+    public SampleBuilder<? extends IGESAction> getBuilder() {return builder;}
 }

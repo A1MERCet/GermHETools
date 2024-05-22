@@ -1,9 +1,7 @@
 package net.mcbbs.a1mercet.germhetools.player.ges.preset;
 
-import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GActionPanel;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPreset;
-import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.util.IConfig;
 import net.mcbbs.a1mercet.germhetools.util.Options;
@@ -26,9 +24,9 @@ public interface IPreset<T> extends IConfig {
 
     default IPreset<T> createInstance() {return (IPreset<T>) PresetType.create(getType());}
 
-    void copy(IPreset<T> t);
+    void copy(IPreset<?> t);
 
-    GPreset createGPreset(PlayerState ps , IPreset<?> preset , int size);
+    GPreset createGPreset(PlayerState ps , int size);
 
     Options<String> getData();
 
@@ -37,7 +35,7 @@ public interface IPreset<T> extends IConfig {
         PlayerState ps = gpreset.ps;
         GActionPanel g = new GActionPanel(ps.player);
 
-        PresetLibrary.PresetList<IPreset<?>> list = ps.ges.library.getFrom(getID());
+        PresetList<IPreset<?>> list = ps.ges.library.getFrom(getID());
 
         g.addAction(new GActionPanel.Action("id", getID()));
         g.addAction(new GActionPanel.Action("fave","收藏"){
@@ -45,7 +43,7 @@ public interface IPreset<T> extends IConfig {
                 if(!super.callback(parent))return false;
 
 
-                PresetLibrary.PresetList<IPreset<?>> fav = ps.ges.library.getList("收藏夹");
+                PresetList<IPreset<?>> fav = ps.ges.library.getList("收藏夹");
                 if(fav!=null){
                     IPreset<T> copy = createInstance();
                     copy.copy(IPreset.this);

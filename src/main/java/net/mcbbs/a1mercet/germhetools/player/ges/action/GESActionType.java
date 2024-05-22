@@ -24,6 +24,6 @@ public class GESActionType
         registerType("SCALE",       new GESActionScale(null));
         registerType("ROTATE",      new GESActionRotate(null));
         registerType("OFFSET",      new GESActionOffset(null));
-        registerType("CREATE",      new IGESActionCreate(null));
+        registerType("CREATE",      new GESActionCreate(null));
     }
 }
