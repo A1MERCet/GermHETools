@@ -6,6 +6,5 @@ public interface IGESTarget
 {
     String getName();
     String getType();
-    Object getTarget();
     Options<String> getTargetData();
 }

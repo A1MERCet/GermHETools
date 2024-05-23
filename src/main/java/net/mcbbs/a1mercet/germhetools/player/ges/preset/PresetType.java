@@ -25,5 +25,6 @@ public class PresetType {
 
     static {
         register("BLOCK", HEState.class);
+        register("SCENE", Scene.class);
     }
 }

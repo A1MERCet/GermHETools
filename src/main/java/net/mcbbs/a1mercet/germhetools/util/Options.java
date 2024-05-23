@@ -2,6 +2,7 @@ package net.mcbbs.a1mercet.germhetools.util;
 
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.util.Vector;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ public class Options<K> extends HashMap<K, Options.IValue> implements Serializab
         DOUBLE  {@Override public ValueDouble create(Object o)  {ValueDouble v  = new ValueDouble();    v.setValue(o);return v;}},
         LONG    {@Override public ValueLong create(Object o)    {ValueLong v    = new ValueLong();      v.setValue(o);return v;}},
         OBJECT  {@Override public Value create(Object o)        {Value v        = new Value();          v.setValue(o);return v;}},
+        VECTOR  {@Override public ValueVector create(Object o)  {ValueVector v  = new ValueVector();    v.setValue(o);return v;}},
         ;
         public IValue create(Object o){return new Value().setValue(o);}
     }
@@ -131,10 +133,37 @@ public class Options<K> extends HashMap<K, Options.IValue> implements Serializab
         public Long getValue()
         {
             try {
-                return value==null?0L:(long)value;
+                return value instanceof String?Long.parseLong((String) value):value==null?0L:(long)value;
             }catch (Exception e){e.printStackTrace();return 0L;}
         }
         @Override public Type getValueType(){return Type.LONG;}
+    }
+    public static class ValueVector extends Value
+    {
+        @Override
+        public Vector getValue()
+        {
+            try {
+                return value instanceof Vector ? (Vector)value : null;
+            }catch (Exception e){e.printStackTrace();return null;}
+        }
+
+        @Override
+        public Value setValue(Object o)
+        {
+            if(o instanceof String){
+                String[] sp = ((String) o).split(",");
+                if(sp.length<3) sp = ((String) o).split(" ");
+                if(sp.length<3) sp = ((String) o).split("/");
+                if(sp.length<3) sp = ((String) o).split("-");
+                if(sp.length<3) {value = new Vector();return this;}
+
+                value = new Vector().setX(Double.parseDouble(sp[0])).setY(Double.parseDouble(sp[1])).setZ(Double.parseDouble(sp[2]));
+            }
+            return super.setValue(o);
+        }
+
+        @Override public Type getValueType(){return Type.VECTOR;}
     }
 
     public Options()
@@ -154,11 +183,19 @@ public class Options<K> extends HashMap<K, Options.IValue> implements Serializab
         else if(o instanceof Double)    return Type.DOUBLE  .create(o);
         else if(o instanceof Long)      return Type.LONG    .create(o);
         else if(o instanceof Boolean)   return Type.BOOLEAN .create(o);
+        else if(o instanceof Vector)    return Type.VECTOR  .create(o);
         else                            return Type.OBJECT  .create(o);
     }
 
-    public IValue putDefault(K key, Object value) {
-        return super.put(key, create(value));
+    public IValue putDefault(K key, Object value) {return super.put(key, create(value));}
+
+    public Vector getVector(K key){return getVector(key,null);}
+    public Vector getVector(K key,Vector def)
+    {
+        IValue v = get(key);if(v==null)return def;
+        if(v instanceof ValueVector)
+            return ((ValueVector) v).getValue();
+        return def;
     }
 
     public String getString(K key){return getString(key,null);}

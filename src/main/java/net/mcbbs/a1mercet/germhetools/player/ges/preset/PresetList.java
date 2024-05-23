@@ -51,7 +51,7 @@ public class PresetList<E extends IPreset<?>> extends ArrayList<E> implements IC
                     String type = section.getString("Preset." + i + ".Type");
                     E s = (E) PresetType.create(type);
                     if (s == null) {
-                        Bukkit.getLogger().warning("预设类型 [" + type + "] 创建失实例败");
+                        Bukkit.getLogger().warning("预设类型 [" + type + "] 创建实例败");
                         continue;
                     }
                     s.load(section.getConfigurationSection("Preset." + i));

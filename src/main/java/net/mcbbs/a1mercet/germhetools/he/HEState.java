@@ -106,6 +106,7 @@ public class HEState implements IPreset<HEState> , IGESBlock
 
     public HEState()
     {
+        this.data.putDefault("date",System.currentTimeMillis());
     }
     public HEState(HEState s)
     {
@@ -306,11 +307,9 @@ public class HEState implements IPreset<HEState> , IGESBlock
     @Override public String getType() {return "BLOCK";}
     @Override public String getID() {return id;}
     @Override public String getName() {return name;}
-    @Override public long getAddDate() {return data.getLong("date");}
-    @Override public HEState getObject() {return this;}
     @Override public Options<String> getData() {return data;}
     @Override public void copy(IPreset<?> preset) {
-        HEState s = (HEState) preset.getObject();
+        HEState s = (HEState) preset;
 
         this.id=s.id;
         this.name=s.name;
@@ -359,14 +358,11 @@ public class HEState implements IPreset<HEState> , IGESBlock
 
 
     @Override public Location getLocation()                     {return location;}
-    @Override public void remove()                              {if(location.getWorld()!=null)location.getBlock().setType(Material.AIR);}
     @Override public void setOffset(Vector vector)              {transform.copy(vector);}
     @Override public Vector getOffset()                         {return transform;}
     @Override public void setRotate(Vector vector)              {rotate.copy(vector);}
     @Override public Vector getRotate()                         {return rotate;}
     @Override public void setScale(Vector vector)               {scale.copy(vector);}
     @Override public Vector getScale()                          {return scale;}
-
-    @Override public Object getTarget() {return this;}
     @Override public Options<String> getTargetData() {return targetData;}
 }

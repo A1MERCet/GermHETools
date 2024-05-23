@@ -11,7 +11,8 @@ public interface IGESBlock extends IGESLocation
     default String getName(){Location l = getLocation();return l==null?"-":l.toVector().toString();}
 
     default Block getBlock(){Location loc = getLocation();return loc==null?null:getLocation().getBlock();}
-    default void delete()
+    @Override
+    default void remove()
     {
         Location l = getLocation();
         if(l!=null&&l.getWorld()!=null)

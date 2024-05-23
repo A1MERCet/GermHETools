@@ -18,9 +18,7 @@ public interface IPreset<T> extends IConfig {
 
     String getName();
 
-    long getAddDate();
-
-    T getObject();
+    default long getAddDate(){return getData().getLong("date");}
 
     default IPreset<T> createInstance() {return (IPreset<T>) PresetType.create(getType());}
 

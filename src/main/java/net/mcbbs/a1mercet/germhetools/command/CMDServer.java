@@ -1,21 +1,19 @@
 package net.mcbbs.a1mercet.germhetools.command;
 
-import net.mcbbs.a1mercet.germhetools.GermHETools;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.EnumHand;
-import net.minecraft.server.v1_12_R1.PacketPlayInBlockPlace;
-import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
+import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
+import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
+import net.mcbbs.a1mercet.germhetools.util.UtilWorld;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 
@@ -27,26 +25,21 @@ public class CMDServer extends CMDBase
     }
 
     @CommandArgs(
-            describe    = "test",
-            args        = {"test"} ,
+            describe    = "打印手中物品/指针方块NBT",
+            args        = {"nbt"} ,
             types       = {ArgType.DEPEND},
             playerOnly = true
     )
-    public void test(CommandSender sender)
+    public void printNBT(CommandSender sender)
     {
         Player p = (Player)sender;
 
-        CraftPlayer craftPlayer = (CraftPlayer) p;
-        Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->{
-            PacketPlayInBlockPlace packet = new PacketPlayInBlockPlace(EnumHand.MAIN_HAND);
-            craftPlayer.getHandle().playerConnection.sendPacket(packet);
-        },1);
-        Bukkit.getScheduler().runTaskLater(GermHETools.getInstance(),()->{
-            CraftWorld craftWorld = (CraftWorld)p.getWorld();
-            BlockPosition blockPosition = new BlockPosition(0,0,0);
-            PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange(craftWorld.getHandle(),blockPosition);
-            craftPlayer.getHandle().playerConnection.sendPacket(packet);
-        },1);
+        if(p.getInventory().getItemInMainHand()!=null&&p.getInventory().getItemInMainHand().getType()!=Material.AIR)
+            UtilNBT.printNBT(UtilNBT.getItemNBT(p.getInventory().getItemInMainHand()));
+
+        Block b = UtilPlayer.rayTraceBlock(p,1000D);
+        if(b==null)return;
+        UtilNBT.printNBT(UtilNBT.getBlockNBT(b));
     }
 
     @CommandArgs(
