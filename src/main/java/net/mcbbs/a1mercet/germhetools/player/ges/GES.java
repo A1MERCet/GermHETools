@@ -1,8 +1,6 @@
 package net.mcbbs.a1mercet.germhetools.player.ges;
 
-import com.germ.germplugin.api.GermPacketAPI;
 import com.germ.germplugin.api.util.EntityUtil;
-import com.germ.germplugin.api.util.PlayerUtil;
 import com.germ.germplugin.api.util.RayTrackResult;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.germ.ges.GGES;
@@ -12,12 +10,17 @@ import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.ActionHistory;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
+import net.mcbbs.a1mercet.germhetools.player.ges.actiontile.GESTitleActionManager;
+import net.mcbbs.a1mercet.germhetools.player.ges.actiontile.IGESTitleAction;
 import net.mcbbs.a1mercet.germhetools.player.ges.builder.SampleBuilder;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
 import net.mcbbs.a1mercet.germhetools.player.ges.target.IGESTarget;
 import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GES
 {
@@ -27,6 +30,8 @@ public class GES
     public final ActionHistory history = new ActionHistory(this);
     public final PresetLibrary library;
 
+    public final List<IGESTitleAction> titleActions       = new ArrayList<>();
+    public final List<IGESAction> actions                 = new ArrayList<>();
     protected SampleBuilder<? extends IGESAction> builder = null;
     public IGESTarget target = null;
 
@@ -34,6 +39,26 @@ public class GES
     {
         this.ps             = ps;
         this.library        = new PresetLibrary(ps);
+    }
+
+    public void init()
+    {
+        titleActions.clear();
+        actions.clear();
+
+        for(String s : GESTitleActionManager.registerList.keySet())
+        {
+            IGESTitleAction a = GESTitleActionManager.create(s);
+            if(a==null)continue;
+            titleActions.add(a);
+        }
+        for(String s : GESActionType.types.keySet())
+        {
+            IGESAction a = GESActionType.create(s,this);
+            if(a==null)continue;
+            actions.add(a);
+        }
+
     }
 
     public boolean setBuilder(String type)
@@ -94,7 +119,21 @@ public class GES
             builder.keyHandle(key , assist);
         }
 
-        if(gui!=null) gui.onKeyHandle(key,assist);
+        for(IGESTitleAction a : titleActions)
+        {
+            int[] k = a.getKey();
+            if( (k[0] == key && k[1]==assist) )
+                a.execute(this);
+
+        }
+        for(IGESAction a : actions)
+        {
+            int[] k = a.getKey();
+            if( (k[0] == key && k[1]==assist) )
+                setBuilder(a);
+        }
+
+        if(gui!=null) gui.update();
     }
 
     public void setTarget(IGESTarget target){setTarget(target,false);}
@@ -119,7 +158,7 @@ public class GES
     public boolean setTargetBlock(Block block){return setTargetBlock(block,false);}
     public boolean setTargetBlock(Block block,boolean tip)
     {
-        if(block!=null&&BlockManager.material.name().equals(block.getType().name()))
+        if(BlockManager.isHEBlock(block))
         {
             HEState pointer = new HEState().parse(block);
             if(pointer==null){warn("不受支持的方块类型["+block.getType().name()+"]");return false;}
@@ -153,6 +192,7 @@ public class GES
             if(this.gui!=null){this.gui.closeFrom(ps.player);this.gui=null;}
             removeBuilder();
         }else {
+            this.init();
             this.gui = new GGES(this);
             this.gui.build();
             this.gui.openHUDTo(ps.player);

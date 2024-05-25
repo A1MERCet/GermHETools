@@ -10,10 +10,11 @@ import java.util.HashMap;
 
 public class BlockManager
 {
-    public static Material material = Material.valueOf("HUEIHUEAENGINE_CUSTOMBLOCK");
+    public static String heMaterial = "HUEIHUEAENGINE_CUSTOMBLOCK";
 
     public static HashMap<Location, HEState> cache = new HashMap<>();
 
+    public static boolean isHEBlock(Block b) {return b != null && heMaterial.equals(b.getType().name());}
     public static void init()
     {
     }

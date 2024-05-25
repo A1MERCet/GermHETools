@@ -1,6 +1,9 @@
 package net.mcbbs.a1mercet.germhetools.gui.germ;
 
 import com.germ.germplugin.api.dynamic.gui.*;
+import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
+import net.mcbbs.a1mercet.germhetools.gui.IGui;
+import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.IPreset;
 import net.mcbbs.a1mercet.germhetools.player.ges.preset.PresetLibrary;
@@ -124,7 +127,8 @@ public class GPresetLibrary extends GermGuiBase
             int layoutHeight = getLayoutHeight();
 
             background.setHeight(layoutHeight+"/1440*h");
-            scroll.setScrollableV(layoutHeight+"/1440*h");
+            scroll.setHeight((layoutHeight-20)+"/1440*h");
+            scroll.setScrollableV((presets.size()/PMAX_RANK*(PSIZE+PINTERVAL)+100)+"/1440*h");
             scroll.setHeightV("("+layoutHeight+"-110)/1440*h");
 
             update();
@@ -169,6 +173,11 @@ public class GPresetLibrary extends GermGuiBase
         {
             GPreset gpreset = p.createGPreset(ps,PSIZE);
             gpreset.registerCallbackSelect((pr,g)->callbackSelect(gpreset));
+            ((GPresetHEBlock)gpreset).registerCallbackEdit((pr, g)->{
+                IGui gui = HEGuiManager.createHEStateGui(pr.player,(HEState) p,false);
+                gui.openChildGuiTo(pr.player);
+                return false;
+            });
             return gpreset;
         }
 
@@ -183,14 +192,17 @@ public class GPresetLibrary extends GermGuiBase
     public final GermGuiButton close        = UtilGerm2K.createButton("close","he/library/close.png",562,2)
             .registerCallbackHandler((p,b)->close(), GermGuiButton.EventType.LEFT_CLICK);
 
-    public final GermGuiScroll scroll = new GermGuiScroll("scroll")
+//    public final GermGuiScroll scroll = new GermGuiScroll("scroll")
+//            .setWidth("590/2560*w").setHeight("545/1440*h")
+//            .setLocationX("5/2560*w").setLocationY("45/1440*h")
+//            .setRelative(true).setScrollDraggable(true)
+//            .setInvalidV(false)
+//            .setScrollableV("0/1440*w")
+//            .setSliderV(new GermGuiColor("sliderV").setEndColor(0xFF232323).setColor(0xFF232323).setWidth("0/2560*w").setHeight("0/1440*h"))
+//            .setSliderH(new GermGuiColor("sliderH").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"));
+    public final GermGuiCanvas scroll = new GermGuiCanvas("canvas")
             .setWidth("590/2560*w").setHeight("545/1440*h")
-            .setLocationX("5/2560*w").setLocationY("45/1440*h")
-            .setRelative(true).setScrollDraggable(true)
-            .setInvalidV(false)
-            .setScrollableV("0/1440*w")
-            .setSliderV(new GermGuiColor("sliderV").setEndColor(0xFF232323).setColor(0xFF232323).setWidth("0/2560*w").setHeight("0/1440*h"))
-            .setSliderH(new GermGuiColor("sliderH").setEndColor(0xAA000000).setColor(0xAA000000).setWidth("0").setHeight("0"));
+            .setLocationX("5/2560*w").setLocationY("45/1440*h");
 
     public GPresetLibrary(PlayerState ps)
     {
@@ -247,7 +259,7 @@ public class GPresetLibrary extends GermGuiBase
             h+=list.getListHeight()+5;
             if(scroll.getGuiPart(list.getIndexName())==null)scroll.addGuiPart(list);
         }
-        scroll.setScrollableV((h+50)+"/1440*h");
+//        scroll.setScrollableV((h+50)+"/1440*h");
     }
     public void removeList(GList list)
     {

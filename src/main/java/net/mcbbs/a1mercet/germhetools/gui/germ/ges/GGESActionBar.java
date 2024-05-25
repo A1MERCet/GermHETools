@@ -5,7 +5,6 @@ import com.germ.germplugin.api.dynamic.gui.GermGuiColor;
 import com.germ.germplugin.api.dynamic.gui.GermGuiScroll;
 import net.mcbbs.a1mercet.germhetools.gui.germ.ges.action.GGESAction;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
-import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.IGESAction;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
 import org.bukkit.Bukkit;
@@ -40,10 +39,9 @@ public class GGESActionBar extends GermGuiCanvas
     {
         addGuiPart(UtilGerm2K.createTexture("main","he/ges/builder/main.png",2406,0));
 
-        for(String str : GESActionType.types.keySet())
+        for(IGESAction a : ges.actions)
         {
-            IGESAction a = GESActionType.create(str, ges);
-            if(a==null || !a.showInHUD()){continue;}
+            if(!a.showInHUD()){continue;}
 
             GGESAction g = new GGESAction(this,a);
             g.build();

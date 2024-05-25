@@ -5,13 +5,14 @@ import net.mcbbs.a1mercet.germhetools.gui.germ.ges.action.GGESAction;
 import net.mcbbs.a1mercet.germhetools.gui.germ.ges.samplerbuilder.GSamplerBuilder;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 
 public class GGES extends GermGuiBase
 {
     public final GES ges;
     public GGESTitleBar titleBar;
     public GGESActionBar actionBar;
-    public GSamplerBuilder builder;
+    public @Nullable GSamplerBuilder builder;
 
     public GMSGContainer msgContainer;
 
@@ -25,11 +26,11 @@ public class GGES extends GermGuiBase
     {
         this.msgContainer = new GMSGContainer(this);
 
-        this.titleBar = new GGESTitleBar(this);
+        this.titleBar     = new GGESTitleBar(this);
         this.titleBar.build();
         addGuiPart(titleBar);
 
-        this.actionBar = new GGESActionBar(this);
+        this.actionBar    = new GGESActionBar(this);
         this.actionBar.build();
         addGuiPart(actionBar);
 
@@ -37,7 +38,9 @@ public class GGES extends GermGuiBase
     }
     public void update()
     {
-
+        titleBar.update();
+        actionBar.update();
+        if(builder!=null)builder.update();
     }
 
 
@@ -61,23 +64,6 @@ public class GGES extends GermGuiBase
     }
     public void onClearBuilder()
     {
-    }
-    public void onKeyHandle(int key , int assist)
-    {
-        Bukkit.getLogger().warning(key+" "+assist);
 
-        for(GGESTitleBar.GGESTitleAction g : titleBar.actions)
-        {
-            int[] k = g.action.getKey();
-            if( (k[0] == key && k[1]==assist) )
-                g.callback();
-
-        }
-        for(GGESAction g : actionBar.actions)
-        {
-            int[] k = g.action.getKey();
-            if( (k[0] == key && k[1]==assist) )
-                g.callback();
-        }
     }
 }

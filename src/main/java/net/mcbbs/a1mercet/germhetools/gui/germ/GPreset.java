@@ -17,8 +17,9 @@ public class GPreset extends GermGuiCanvas
         void onSelect(PlayerState ps,GPreset preset);
     }
 
-    protected GPresetLibrary.ICallbackSelect callbackSelect;
-    public GPreset registerCallbackSelect(GPresetLibrary.ICallbackSelect i){callbackSelect=i;return this;}
+    protected ICallbackSelect callbackSelect;
+    public GPreset registerCallbackSelect(ICallbackSelect i){callbackSelect=i;return this;}
+
     public GPreset clearCallbackSelect(){callbackSelect=null;return this;}
     public void callbackSelect()
     {
@@ -48,7 +49,9 @@ public class GPreset extends GermGuiCanvas
         name    = UtilGerm2K.createLabel("name","",size/2,size-25,2F, GermGuiLabel.Align.CENTER).setOmitWidth("180/2560*w");
         button  = UtilGerm2K.createButton("button","he/library/preset.png",0,0)
             .registerCallbackHandler((p,b)->onLeftClick(),  GermGuiButton.EventType.LEFT_CLICK)
-            .registerCallbackHandler((p,b)->onRightClick(), GermGuiButton.EventType.RIGHT_CLICK);
+            .registerCallbackHandler((p,b)->onRightClick(), GermGuiButton.EventType.RIGHT_CLICK)
+            .registerCallbackHandler((p,b)->onMidClick(), GermGuiButton.EventType.MIDDLE_CLICK)
+        ;
 
         addGuiPart(button);
         addGuiPart(img);
@@ -65,6 +68,10 @@ public class GPreset extends GermGuiCanvas
     public void onLeftClick()
     {
         callbackSelect();
+    }
+    public void onMidClick()
+    {
+
     }
     public void onRightClick()
     {

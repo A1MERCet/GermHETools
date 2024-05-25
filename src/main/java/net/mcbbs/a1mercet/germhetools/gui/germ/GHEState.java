@@ -143,7 +143,8 @@ public class GHEState extends GermGuiBase
         public GMaterialBar addMaterialBar(String material)
         {
             GMaterialBar bar = addMaterialBar();
-            bar.inputName.setInput(material.split(":")[0]);
+            String[] split = material.split(":");
+            bar.inputName.setInput(split.length>0?material.split(":")[0]:"");
             bar.inputPath.setInput(material.replace(bar.inputName.getInput()+":",""));
             return bar;
         }
@@ -289,6 +290,7 @@ public class GHEState extends GermGuiBase
     }
     protected void registerKeyHandler()
     {
+        registerKeyDownHandler(KeyType.KEY_TAB,(p,g)->g.close());
         registerKeyDownHandler(KeyType.KEY_UP,(p,g)->{
             if(focus==null)return;
 

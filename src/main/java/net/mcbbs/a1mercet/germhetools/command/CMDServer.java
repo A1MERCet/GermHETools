@@ -3,9 +3,11 @@ package net.mcbbs.a1mercet.germhetools.command;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
 import net.mcbbs.a1mercet.germhetools.gui.HEGuiManager;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetLibrary;
+import net.mcbbs.a1mercet.germhetools.he.HEManager;
 import net.mcbbs.a1mercet.germhetools.he.HEState;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.action.GESActionType;
+import net.mcbbs.a1mercet.germhetools.util.Options;
 import net.mcbbs.a1mercet.germhetools.util.UtilNBT;
 import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
 import net.mcbbs.a1mercet.germhetools.util.UtilWorld;
@@ -24,6 +26,47 @@ public class CMDServer extends CMDBase
         super("ghe", CMDServer.class);
     }
 
+    @CommandArgs(
+            describe    =
+            "\n             参考格式: CREATE_EMPTY_TEXTURE,0,MODEL_PATH,D:/xx,TEXTURE_PATH,D:/xx,IMAGE_TYPED,png" +
+            "\n             生成路径内所有模型文件至预设文件" +
+            "\n             生成的HEState默认带多少个空材质槽"+
+            "\n             [int/String]......CREATE_EMPTY_TEXTURE"+
+            "\n"+
+            "\n             重定向模型路径"+
+            "\n             -留空按文件所在路径"+
+            "\n             [String]..........MODEL_PATH"+
+            "\n"+
+            "\n             重定向纹理路径"+
+            "\n             -留空按文件所在路径"+
+            "\n             -NONE不生成纹理路径"+
+            "\n             [String]..........TEXTURE_PATH"+
+            "\n"+
+            "\n             纹理文件格式 默认png"+
+            "\n             [STRING]..........IMAGE_TYPE",
+            args        = {"he","gen","模型路径","输出文件","参数"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND,ArgType.STRING,ArgType.STRING,ArgType.STRINGARY}
+    )
+    public void modelToPreset(CommandSender sender,String input,String output,String[] parameters)
+    {
+        Options<String> p = new Options<>();
+        for(int i = 0;i<parameters.length;i+=2)
+            if(i+1<=parameters.length-1) 
+                p.putDefault(parameters[i],parameters[i+1]);
+        HEManager.modelToPreset(input,output,p);
+    }
+
+    @CommandArgs(
+            describe    =
+                    "\n             生成路径内所有模型文件至预设文件",
+            args        = {"he","gen","模型路径","输出文件"} ,
+            types       = {ArgType.DEPEND,ArgType.DEPEND,ArgType.STRING,ArgType.STRING}
+    )
+    public void modelToPreset(CommandSender sender,String input,String output)
+    {
+        modelToPreset(sender,input,output,new String[]{});
+    }
+    
     @CommandArgs(
             describe    = "打印手中物品/指针方块NBT",
             args        = {"nbt"} ,

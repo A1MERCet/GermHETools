@@ -5,10 +5,9 @@ import com.germ.germplugin.api.dynamic.gui.GermGuiCanvas;
 import com.germ.germplugin.api.dynamic.gui.GermGuiColor;
 import com.germ.germplugin.api.dynamic.gui.GermGuiScroll;
 import net.mcbbs.a1mercet.germhetools.player.ges.GES;
-import net.mcbbs.a1mercet.germhetools.player.ges.actiontile.GESTileActionManager;
+import net.mcbbs.a1mercet.germhetools.player.ges.actiontile.GESTitleActionManager;
 import net.mcbbs.a1mercet.germhetools.player.ges.actiontile.IGESTitleAction;
 import net.mcbbs.a1mercet.germhetools.util.UtilGerm2K;
-import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,16 +69,15 @@ public class GGESTitleBar extends GermGuiCanvas
         addGuiPart(UtilGerm2K.createTexture("main","he/ges/action/main.png"));
         addGuiPart(scroll);
 
-        for(String s : GESTileActionManager.registerList.keySet())
+        for(IGESTitleAction a : ges.titleActions)
         {
-            IGESTitleAction a = GESTileActionManager.create(s);
-            if(a==null || !a.showInTitle())continue;
+            if(!a.showInTitle())continue;
             GGESTitleAction g = new GGESTitleAction(this,a);
             g.build();
             actions.add(g);
         }
 
-        exit = new GGESTitleAction(this,GESTileActionManager.create("exit"));
+        exit = new GGESTitleAction(this, GESTitleActionManager.create("exit"));
         exit.build();
 
         UtilGerm2K.setLocation(exit,804,4);

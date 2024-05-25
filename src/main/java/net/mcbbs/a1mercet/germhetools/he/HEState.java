@@ -80,27 +80,48 @@ public class HEState implements IPreset<HEState> , IGESBlock
             data.load(section.getConfigurationSection("data"));
 
         material.clear();
-        material.addAll(section.getStringList("Material"));
+        for(String materialStr : section.getStringList("Material"))
+        {
+            boolean hasNameSpace = materialStr.contains(":");
+            if(!hasNameSpace && materialStr.length() > 0){
+                String[] modelAry = model.split("/");
+                if(modelAry.length>1){
+                    StringBuilder b = new StringBuilder();
+                    b.append(materialStr).append(":");
+
+                    for(int i = 0;i<=modelAry.length-2;i++)
+                        b.append(modelAry[i]);
+                    b.append("/texture/").append(materialStr.toLowerCase()).append(".jpg");
+
+                    String result = b.toString();
+
+                    Bukkit.getLogger().warning("转换纹理路径 ["+materialStr+"] 至 "+result);
+                    material.add(result);
+                }
+            }else {
+                material.add(materialStr);
+            }
+        }
     }
 
-    public String id = "hestate";
-    public String name = "HEState";
-    public String model = "";
-    public String texture = "";
+    public String id                    = "hestate";
+    public String name                  = "HEState";
+    public String model                 = "";
+    public String texture               = "";
 
-    public final Location location = new Location(null,0,0,0);
-    public final Vector transform = new Vector();
-    public final Vector scale = new Vector();
-    public final Vector rotate = new Vector();
-    public final Vector aabbMax = new Vector();
-    public final Vector aabbMin = new Vector();
+    public final Location location      = new Location(null,0,0,0);
+    public final Vector transform       = new Vector(0.5D,0D,0.5D);
+    public final Vector scale           = new Vector(1D,1D,1D);
+    public final Vector rotate          = new Vector();
+    public final Vector aabbMax         = new Vector();
+    public final Vector aabbMin         = new Vector();
     public double size;
-    public String followStyle = "static";
-    public boolean passable = false;
-    public boolean enableGlowTexture = false;
-    public String glowTexture = "";
-    public Options<String> data = new Options<>();
-    public Options<String> targetData = new Options<>();
+    public String followStyle           = "static";
+    public boolean passable             = false;
+    public boolean enableGlowTexture    = false;
+    public String glowTexture           = "";
+    public Options<String> data         = new Options<>();
+    public Options<String> targetData   = new Options<>();
 
     public final List<String> material = new ArrayList<>();
 
@@ -115,7 +136,7 @@ public class HEState implements IPreset<HEState> , IGESBlock
 
     public ItemStack createItemStack()
     {
-        ItemStack i = new ItemStack(BlockManager.material);
+        ItemStack i = new ItemStack(Material.valueOf(BlockManager.heMaterial));
 
         NBTTagCompound tag = UtilNBT.getItemNBT(i);
         NBTTagCompound cutomsBlock = new NBTTagCompound();
@@ -130,9 +151,9 @@ public class HEState implements IPreset<HEState> , IGESBlock
         setLocation(loc);
 
         Block b = location.getBlock();
-        if(!(BlockManager.material.name().equals(b.getType().name()))){
-            b.setType(Material.valueOf(BlockManager.material.name()));
-        }
+
+        if(!BlockManager.isHEBlock(b))
+            b.setType(Material.valueOf(BlockManager.heMaterial));
 
         NBTTagCompound tag = UtilNBT.getBlockNBT(b);
         tag.set("CustomBlock",createTag());
@@ -192,7 +213,8 @@ public class HEState implements IPreset<HEState> , IGESBlock
         NBTTagCompound layer_material = new NBTTagCompound();
         for(String m : material)
         {
-            String name = m.split(":")[0];
+            String[] split = m.split(":");
+            String name = split.length>0?m.split(":")[0]:"";
             String path = m.replace(name+":","");
             layer_material.setString(name,path);
         }
@@ -213,7 +235,7 @@ public class HEState implements IPreset<HEState> , IGESBlock
     }
     public HEState parse(Block b)
     {
-        if(!BlockManager.material.name().equals(b.getType().name()))return null;
+        if(!BlockManager.isHEBlock(b))return null;
 
         setLocation(b.getLocation());
 
@@ -347,7 +369,8 @@ public class HEState implements IPreset<HEState> , IGESBlock
             @Override public boolean callback(GActionPanel parent) {
                 if(!super.callback(parent))return false;
 
-                HEGuiManager.createHEStateGui(ps.player, HEState.this,false).openGuiTo(ps.player);
+                if(((GPresetHEBlock)gPreset).callbackEdit.handle(parent.ps,gPreset))
+                    HEGuiManager.createHEStateGui(ps.player, HEState.this,false).openGuiTo(ps.player);
                 parent.close();
 
                 return true;

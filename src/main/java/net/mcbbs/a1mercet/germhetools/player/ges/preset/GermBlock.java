@@ -4,7 +4,6 @@ import com.germ.germplugin.api.GermBlockAPI;
 import com.germ.germplugin.api.dynamic.item.GermItemBlock;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GActionPanel;
 import net.mcbbs.a1mercet.germhetools.gui.germ.GPreset;
-import net.mcbbs.a1mercet.germhetools.gui.germ.GPresetHEBlock;
 import net.mcbbs.a1mercet.germhetools.player.PlayerState;
 import net.mcbbs.a1mercet.germhetools.player.ges.target.IGESBlock;
 import net.mcbbs.a1mercet.germhetools.util.Options;
@@ -24,9 +23,9 @@ public class GermBlock implements IGESBlock , IPreset<GermBlock>
     {
         this.id         = section.getString("ID");
         this.name       = section.getString("Name");
-        this.offset.copy(section.getVector("Offset",new Vector()));
-        this.rotate.copy(section.getVector("Rotate",new Vector()));
-        this.scale.copy(section.getVector("Scale",new Vector()));
+        this.offset.copy(section.getVector("Offset", new Vector()));
+        this.rotate.copy(section.getVector("Rotate", new Vector()));
+        this.scale.copy(section.getVector("Scale",   new Vector()));
 
         if(section.getConfigurationSection("GermBlock")!=null)
             this.block.loadSrc(section.getConfigurationSection("GermBlock"));
@@ -60,6 +59,10 @@ public class GermBlock implements IGESBlock , IPreset<GermBlock>
     public Options<String> data         = new Options<>();
     public Options<String> targetData   = new Options<>();
 
+    public GermBlock(GermItemBlock block)
+    {
+        this.block.copyFrom(block);
+    }
     public GermBlock()
     {
 
@@ -71,7 +74,7 @@ public class GermBlock implements IGESBlock , IPreset<GermBlock>
     @Override
     public boolean place(Location loc)
     {
-
+        GermItemBlock b = this.block;
         return true;
     }
 

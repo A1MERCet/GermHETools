@@ -17,6 +17,8 @@ public abstract class CMDBase implements CommandExecutor
             @Override public Object formart(String v) {try {return Integer.parseInt(v);}catch (Exception e){return null;}}},
         STRING("字符"){
             @Override public Object formart(String v) {try {return v;}catch (Exception e){return null;}}},
+        STRINGARY("字符数组"){
+            @Override public Object formart(String v) {try {return v.split(",");}catch (Exception e){return null;}}},
         FLOAT("浮点"){
             @Override public Object formart(String v) {try {return Float.parseFloat(v);}catch (Exception e){return null;}}},
         BOOLEAN("布尔"){

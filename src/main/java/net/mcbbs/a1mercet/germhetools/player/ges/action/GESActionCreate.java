@@ -20,9 +20,9 @@ public class GESActionCreate extends GESActionVector
     @Override
     public void onApplyTargetData()
     {
-        IGESLocation target = (IGESLocation)getTarget();
+        IGESBlock target = (IGESBlock)getTarget();
         Vector vector = calTargetVector();
-        target.updateLocation(vector.toLocation(ges.ps.player.getWorld()));
+        target.place(vector.toLocation(ges.ps.player.getWorld()));
     }
 
     public GESActionCreate setBlock(IGESBlock block) {ges.setTarget(block);this.block = block;return this;}

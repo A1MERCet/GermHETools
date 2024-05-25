@@ -96,6 +96,7 @@ public class PlayerState implements IConfig
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_GRAVE.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RCONTROL.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LCONTROL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Y.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_X.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_F.getKeyId());
             GermPacketAPI.sendKeyRegister(player, KeyType.KEY_D.getKeyId());
