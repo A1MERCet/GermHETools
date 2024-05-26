@@ -75,42 +75,6 @@ public class PlayerState implements IConfig
         }
     }
 
-    public void initGES()
-    {
-        if(!allowGES)return;
-
-        if(player!=null)
-        {
-            ges = new GES(this);
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_UP.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DOWN.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LEFT.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RIGHT.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RETURN.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_BACK.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Z.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RMENU.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LMENU.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_CAPITAL.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_GRAVE.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RCONTROL.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LCONTROL.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Y.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_X.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_F.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_D.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_N.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_R.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_C.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_G.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_MINUS.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DELETE.getKeyId());
-            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_INSERT.getKeyId());
-        }
-    }
-
     public boolean isGESEnable(){return ges!=null&&ges.enable;}
 
 
@@ -151,7 +115,6 @@ public class PlayerState implements IConfig
     public void load(ConfigurationSection section)
     {
         allowGES = section.getBoolean("AllowGES");
-        initGES();
 
         if(ges!=null && section.getConfigurationSection(ges.library.getDefaultPath())!=null)
         {

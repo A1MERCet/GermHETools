@@ -1,5 +1,7 @@
 package net.mcbbs.a1mercet.germhetools.player.ges;
 
+import com.germ.germplugin.api.GermPacketAPI;
+import com.germ.germplugin.api.KeyType;
 import com.germ.germplugin.api.util.EntityUtil;
 import com.germ.germplugin.api.util.RayTrackResult;
 import net.mcbbs.a1mercet.germhetools.api.BlockManager;
@@ -18,6 +20,7 @@ import net.mcbbs.a1mercet.germhetools.player.ges.target.IGESTarget;
 import net.mcbbs.a1mercet.germhetools.util.UtilPlayer;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +60,37 @@ public class GES
             IGESAction a = GESActionType.create(s,this);
             if(a==null)continue;
             actions.add(a);
+        }
+
+        Player player = ps.player;
+        //register germ keys
+        {
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_UP.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DOWN.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LEFT.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RIGHT.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RETURN.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_BACK.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Z.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RMENU.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LMENU.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_CAPITAL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_GRAVE.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_RCONTROL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_LCONTROL.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_Y.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_X.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_F.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_D.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_N.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_R.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_C.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_G.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_MINUS.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_EQUALS.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_DELETE.getKeyId());
+            GermPacketAPI.sendKeyRegister(player, KeyType.KEY_INSERT.getKeyId());
         }
 
     }
@@ -124,7 +158,6 @@ public class GES
             int[] k = a.getKey();
             if( (k[0] == key && k[1]==assist) )
                 a.execute(this);
-
         }
         for(IGESAction a : actions)
         {

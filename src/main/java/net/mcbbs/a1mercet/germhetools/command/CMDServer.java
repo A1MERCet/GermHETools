@@ -27,7 +27,20 @@ public class CMDServer extends CMDBase
     }
 
     @CommandArgs(
+            describe    = "test",
+            args        = {"test","input"} ,
+            types       = {ArgType.DEPEND,ArgType.STRING}
+    )
+    public void test(CommandSender sender,String input)
+    {
+        sender.sendMessage(HEManager.getFileNameOnly(input));
+    }
+
+    @CommandArgs(
             describe    =
+            "\n             读取同名的MTL文件生成材质(默认true)"+
+            "\n             [Boolean/String]..READ_MTL"+
+            "\n"+
             "\n             参考格式: CREATE_EMPTY_TEXTURE,0,MODEL_PATH,D:/xx,TEXTURE_PATH,D:/xx,IMAGE_TYPED,png" +
             "\n             生成路径内所有模型文件至预设文件" +
             "\n             生成的HEState默认带多少个空材质槽"+
